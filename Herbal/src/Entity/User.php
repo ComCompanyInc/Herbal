@@ -153,12 +153,12 @@ class User
         return $this;
     }
 
-    public function isBlocked(): ?bool
+    public function getIsBlocked(): ?bool
     {
         return $this->isBlocked;
     }
 
-    public function setBlocked(bool $isBlocked): static
+    public function setIsBlocked(bool $isBlocked): static
     {
         $this->isBlocked = $isBlocked;
 

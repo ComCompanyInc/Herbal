@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Form;
+use App\Entity\Country;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -31,6 +33,11 @@ class RegistrationForm extends AbstractType
                 'label' => 'Дата рождения: ',
                 'years'  =>  range(1950,2099),
                 'attr' => ['class' => 'form-control'],
+            ])
+            ->add('country', EntityType::class, [
+                'label' => 'Город: ',
+                'attr' => ['class' => 'form-control'],
+                'class' => Country::class,
             ])
             ->add('email', EmailType::class, [
                 'label' => 'E-mail: ',

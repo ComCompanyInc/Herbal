@@ -27,6 +27,11 @@ class Country
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'country', orphanRemoval: true)]
     private Collection $users;
 
+    public function __toString(): string
+    {
+        return $this->name;
+    }
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
