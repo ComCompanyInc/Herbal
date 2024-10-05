@@ -25,6 +25,8 @@ class AccessController extends AbstractController
     #[Route('/registration', name: 'registration')]
     function registrationAction(Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
+        $notification = null;
+
         $registrationForm = $this->createForm(registrationForm::class);
         $registrationForm->handleRequest($request);
 
@@ -62,7 +64,7 @@ class AccessController extends AbstractController
                 $this->entityManager->persist($user);
                 $this->entityManager->flush();
 
-                return $this->redirectToRoute('/login');
+                $notification = "Вы успешно зарегестрированны!";
             } else {
                 //TODO: генерируем сообщение что нельзя создать аккаунт с такой почтой
                 return new Response('аккаунт с такой почтой уже существует!');
@@ -70,7 +72,8 @@ class AccessController extends AbstractController
         }
 
         return $this->render('registration/registration.html.twig', [
-            'registrationForm' => $registrationForm
+            'registrationForm' => $registrationForm,
+            'notification' => $notification,
         ]);
     }
 }
