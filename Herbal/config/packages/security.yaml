@@ -25,7 +25,7 @@ security:
                 check_path: app_login
                 enable_csrf: true
 
-                default_target_path: /news //отвечает за переход на главную страницу (news) после входа
+                default_target_path: /news #отвечает за переход на главную страницу (news) после входа
 
             logout:
                 path: app_logout

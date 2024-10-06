@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ContentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
@@ -33,6 +34,9 @@ class Content
      */
     #[ORM\OneToMany(targetEntity: News::class, mappedBy: 'content', orphanRemoval: true)]
     private Collection $news;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTimeInterface $dateSending = null;
 
     public function __construct()
     {
@@ -68,12 +72,12 @@ class Content
         return $this;
     }
 
-    public function isDelete(): ?bool
+    public function getIsDelete(): ?bool
     {
         return $this->isDelete;
     }
 
-    public function setDelete(bool $isDelete): static
+    public function setIsDelete(bool $isDelete): static
     {
         $this->isDelete = $isDelete;
 
@@ -106,6 +110,18 @@ class Content
                 $news->setContent(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDateSending(): ?\DateTimeInterface
+    {
+        return $this->dateSending;
+    }
+
+    public function setDateSending(\DateTimeInterface $dateSending): static
+    {
+        $this->dateSending = $dateSending;
 
         return $this;
     }

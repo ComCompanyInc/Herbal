@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+
+    <button id="add-news">Создать свою новость</button>
+
+
+    {% block javascripts %}
+        <script>
+            document.getElementById("add-news").addEventListener("click", function() {
+                window.location.href = "/addNews";
+            });
+        </script>
+    {% endblock %}
+
+{% endblock %}
