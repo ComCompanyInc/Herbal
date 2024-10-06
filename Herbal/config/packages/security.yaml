@@ -19,10 +19,14 @@ security:
         main:
             lazy: true
             provider: app_user_provider #users_in_memory
+
             form_login:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
+
+                default_target_path: /news //отвечает за переход на главную страницу (news) после входа
+
             logout:
                 path: app_logout
                 # where to redirect after logout
