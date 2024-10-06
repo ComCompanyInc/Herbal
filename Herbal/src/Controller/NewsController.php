@@ -26,7 +26,9 @@ class NewsController extends AbstractController
     #[Route('/news', name: 'news')]
     public function newsAction() :Response
     {
-        return $this->render('news/news.html.twig');
+        return $this->render('news/news.html.twig', [
+            'news' => $this->entityManager->getRepository(News::class)->findAll()
+        ]);
     }
 
     #[Route('/addNews', name: 'addNews')]

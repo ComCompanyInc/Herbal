@@ -5,6 +5,31 @@
 
     <button id="add-news">Создать свою новость</button>
 
+    <h1>Главное сегодня:</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Заголовок</th>
+                <th>Новость</th>
+                <th>Дата публикации</th>
+                <th>Город издателя</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for new in news %}
+                <tr>
+                    {% if new.content.isDelete == false %}
+                        <th>{{ new.title }}</th>
+                        <th>{{ new.content.mainText | slice(0, 150)}} ...</th>
+                        <th>{{ new.content.dateSending | date }}</th>
+                        <th>{{ new.content.author.country.name }}</th>
+                        <th><button id="{{ new.id }}">Читать далее</button></th>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
     {% block javascripts %}
         <script>
