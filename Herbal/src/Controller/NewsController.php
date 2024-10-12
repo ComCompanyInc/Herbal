@@ -7,6 +7,8 @@ use App\Entity\Content;
 use App\Entity\News;
 use App\Entity\User;
 use App\Form\AddNewsForm;
+use App\Form\NewsForm;
+use App\Repository\NewsRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,18 +26,29 @@ class NewsController extends AbstractController
     }
 
     #[Route('/news', name: 'news')]
-    public function newsAction() :Response
+    public function newsAction(Request $request) :Response
     {
+        $news = $this->entityManager->getRepository(News::class)->findAll();
+
+        $registrationForm = $this->createForm(NewsForm::class);
+        $registrationForm->handleRequest($request);
+
+        if($registrationForm->isSubmitted() && $registrationForm->isValid())
+        {
+            $formData = $registrationForm->getData();
+
+            $news = $this->entityManager->getRepository(News::class)->findByCity($formData['name']);
+        }
+
         return $this->render('news/news.html.twig', [
-            'news' => $this->entityManager->getRepository(News::class)->findAll()
+            'sortForm' => $registrationForm,
+            'news' => $news
         ]);
     }
 
     #[Route('/addNews', name: 'addNews')]
     public function addNewsAction(Request $request): Response
     {
-        //dump($this->getUser()->getId());
-
         $news = new News();
         $content = new Content();
 
@@ -64,6 +77,16 @@ class NewsController extends AbstractController
 
         return $this->render('news/addNews.html.twig', [
             'addNewsForm' => $addNewsForm,
+        ]);
+    }
+
+    #[Route('/comments/{id}', name: 'comments')]
+    public function commentsAction(string $id): Response
+    {
+        $newData = $this->entityManager->getRepository(News::class)->find($id);
+
+        return $this->render('news/comments.html.twig', [
+            'newData' => $newData
         ]);
     }
 }

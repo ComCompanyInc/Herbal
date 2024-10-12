@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\News;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -40,4 +41,17 @@ class NewsRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findByCity(string $cityName)
+    {
+        return $this->createQueryBuilder('n')
+            ->select('n')
+            ->join('n.content', 'c')
+            ->join('c.author', 'a')
+            ->join('a.country', 'country')
+            ->where('country.name = :cityName')
+            ->setParameter('cityName', $cityName)
+            ->getQuery()
+            ->getResult();
+    }
 }

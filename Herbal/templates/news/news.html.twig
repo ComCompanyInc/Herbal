@@ -7,6 +7,8 @@
 
     <h1>Главное сегодня:</h1>
 
+    {{ form(sortForm) }}
+
     <table>
         <thead>
             <tr>
@@ -24,7 +26,7 @@
                         <th>{{ new.content.mainText | slice(0, 150)}} ...</th>
                         <th>{{ new.content.dateSending | date }}</th>
                         <th>{{ new.content.author.country.name }}</th>
-                        <th><button id="{{ new.id }}">Читать далее</button></th>
+                        <th><button class = "open-new" id="{{ new.id }}">Читать далее</button></th>
                     {% endif %}
                 </tr>
             {% endfor %}
@@ -33,8 +35,19 @@
 
     {% block javascripts %}
         <script>
-            document.getElementById("add-news").addEventListener("click", function() {
-                window.location.href = "/addNews";
+            document.addEventListener('DOMContentLoaded', () => {
+
+                document.getElementById("add-news").addEventListener("click", function () {
+                    window.location.href = "/addNews";
+                });
+
+                let buttons = document.querySelectorAll(".open-new");
+
+                for (let i = 0; i < buttons.length; i++) {
+                    buttons[i].addEventListener('click', () => {
+                        window.location.href = "/comments/" + buttons[i].id;
+                    });
+                }
             });
         </script>
     {% endblock %}
