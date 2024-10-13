@@ -33,8 +33,49 @@
                 <th>{{ newData.content.dateSending | date }}</th>
             </tr>
             <tr>
-                <th> {{ newData.content.author.access.email }} {# {{ newAuthor.surname }} {{ newAuthor.name }} {{ newAuthor.patronumic }} ({{  }}) #}</th>
+                <th> {{ newData.content.author.access.email }}</th>
             </tr>
+        </tbody>
+    </table>
+
+    <h1>Комментарии:</h1>
+    <h2>Написать комментарий:</h2>
+
+    {{ form(commentForm) }}
+
+    {% if not(comments is empty) %}
+
+    <table>
+        <thead>
+        <tr>
+            <th>
+                комментарий
+            </th>
+            <th>
+                автор
+            </th>
+            <th>
+                дата
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+
+            {% for comment in comments %}
+                <tr id = "row-{{ comment.content.id }}">
+                    <th>{{ comment.content.mainText }}</th>
+                    <th>{{ comment.content.author.access.email }}</th>
+                    <th>{{ comment.content.dateSending | date }}</th>
+                    {% if (not(user is empty)) and (user.email == comment.content.author.access.email) %}
+                        <th><button class="remove" id="{{ comment.content.id }}">Удалить</button></th>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+
+        {% else %}
+            <h4>Комментариев пока нет.</h4>
+        {% endif %}
+
         </tbody>
     </table>
 
@@ -43,7 +84,37 @@
 
 
     {% block javascripts %}
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const buttons = document.querySelectorAll(".remove");
+
+            for (let i = 0; i < buttons.length; i++) {
+                const button = buttons[i];
+
+                button.addEventListener("click", function() {
+                    startAjax(button.id);
+                });
+            }
+
+            function startAjax(id)
+            {
+
+                $.ajax({
+                    url: '/comments/remove/' + id,
+                    type: 'GET',
+                    success: function (response) {
+                        $("#row-" + id).remove();
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+
+            }
+        });
 
         </script>
     {% endblock %}

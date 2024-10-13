@@ -38,9 +38,16 @@ class Content
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateSending = null;
 
+    /**
+     * @var Collection<int, ContentNews>
+     */
+    #[ORM\OneToMany(targetEntity: ContentNews::class, mappedBy: 'content', orphanRemoval: true)]
+    private Collection $contentNews;
+
     public function __construct()
     {
         $this->news = new ArrayCollection();
+        $this->contentNews = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -122,6 +129,36 @@ class Content
     public function setDateSending(\DateTimeInterface $dateSending): static
     {
         $this->dateSending = $dateSending;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ContentNews>
+     */
+    public function getContentNews(): Collection
+    {
+        return $this->contentNews;
+    }
+
+    public function addContentNews(ContentNews $contentNews): static
+    {
+        if (!$this->contentNews->contains($contentNews)) {
+            $this->contentNews->add($contentNews);
+            $contentNews->setContent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContentNews(ContentNews $contentNews): static
+    {
+        if ($this->contentNews->removeElement($contentNews)) {
+            // set the owning side to null (unless already changed)
+            if ($contentNews->getContent() === $this) {
+                $contentNews->setContent(null);
+            }
+        }
 
         return $this;
     }

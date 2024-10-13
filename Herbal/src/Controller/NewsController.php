@@ -4,17 +4,22 @@ namespace App\Controller;
 
 use App\Entity\Access;
 use App\Entity\Content;
+use App\Entity\ContentNews;
 use App\Entity\News;
 use App\Entity\User;
 use App\Form\AddNewsForm;
+use App\Form\CommentForm;
 use App\Form\NewsForm;
+use App\Repository\ContentNewsRepository;
 use App\Repository\NewsRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Throwable;
 
 class NewsController extends AbstractController
 {
@@ -60,7 +65,6 @@ class NewsController extends AbstractController
 
             $idAccess = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
             $idUser = $this->entityManager->getRepository(User::class)->findOneBy(['access' => $idAccess]);
-            //dd($idUser);
 
             $content->setAuthor($idUser);
             $content->setMainText($addNewsFormData['text']);
@@ -81,12 +85,67 @@ class NewsController extends AbstractController
     }
 
     #[Route('/comments/{id}', name: 'comments')]
-    public function commentsAction(string $id): Response
+    public function commentsAction(string $id, Request $request): Response
     {
+
+        $content = new Content();
+        $contentNews = new ContentNews();
+
+        $commentForm = $this->createForm(CommentForm::class);
+        $commentForm->handleRequest($request);
+
+        $comments = $this->entityManager->getRepository(ContentNews::class)->findCommentsByNews(
+            $this->entityManager->getRepository(News::class)->findOneBy(['id' => $id])
+        );
+
+        //dd($comments);
+        $idAccess = null;
+
+        try {
+            $idAccess = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+            $idUser = $this->entityManager->getRepository(User::class)->findOneBy(['access' => $idAccess]);
+        } catch (\Exception $e) {
+            $idAccess = null;
+        }
+
+        if($commentForm->isSubmitted() && $commentForm->isValid())
+        {
+            $addCommentsFormData = $commentForm->getData();
+
+            $content->setAuthor($idUser);
+            $content->setMainText($addCommentsFormData['text']);
+            $content->setIsDelete(false);
+            $content->setDateSending(DateTime::createFromFormat('dd-mm-YY H:i:s', date('dd-mm-YY H:i:s')));
+            $this->entityManager->persist($content);
+            $this->entityManager->flush();
+
+            $contentNews->setContent($content);
+            $contentNews->setNews($this->entityManager->getRepository(News::class)->findOneBy(['id' => $id]));
+            $contentNews->setContent($content);
+            $this->entityManager->persist($contentNews);
+            $this->entityManager->flush();
+
+            $comments = $this->entityManager->getRepository(ContentNews::class)->findCommentsByNews(
+                $this->entityManager->getRepository(News::class)->findOneBy(['id' => $id])
+            );
+        }
+
         $newData = $this->entityManager->getRepository(News::class)->find($id);
 
         return $this->render('news/comments.html.twig', [
-            'newData' => $newData
+            'user' => $idAccess,
+            'newData' => $newData,
+            'commentForm' => $commentForm,
+            'comments' => $comments
         ]);
+    }
+
+    #[Route('/comments/remove/{id}', name: 'removeComment')]
+    public function deleteCommentsAction(string $id): JsonResponse
+    {
+        $this->entityManager->persist($this->entityManager->getRepository(Content::class)->findOneBy(['id' => $id])->setIsDelete(true));
+        $this->entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
     }
 }
