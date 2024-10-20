@@ -1,121 +1,249 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <head>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" >
+    {% include 'header/header.html.twig' %}
 
-    {% block stylesheets %}
-        <style>
-            table {
-                max-width: 900px;
-            }
-        </style>
-    {% endblock %}
+    <head>
+        <meta charset="UTF-8">
+        <title>Welcome!</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     </head>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Sans+MS&display=swap');
+
+        body {
+            font-family: 'Comic Sans MS', cursive;
+            background-color: #f8f9fa;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto; /* Добавлено для прокрутки */
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(45deg, rgba(40, 167, 69, 0.1) 25%, transparent 25%),
+            linear-gradient(-45deg, rgba(40, 167, 69, 0.1) 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, rgba(40, 167, 69, 0.1) 75%),
+            linear-gradient(-45deg, transparent 75%, rgba(40, 167, 69, 0.1) 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px, 10px 10px, 20px 20px;
+            z-index: -1;
+        }
+
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 150px;
+            height: auto;
+            opacity: 0;
+            animation: fadeIn 2s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #28a745;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            animation: slideIn 2s ease-in-out forwards;
+        }
+
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .table {
+            width: 100%;
+            max-width: 900px; /* Добавлено ограничение по ширине */
+            margin-bottom: 1rem;
+            color: #212529;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            animation: fadeIn 2s ease-in-out 1s forwards;
+        }
+
+        .table th, .table td {
+            padding: 15px;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+            word-wrap: break-word; /* Добавлено для переноса длинных слов */
+            white-space: normal; /* Добавлено для переноса текста */
+        }
+
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+            background-color: #28a745;
+            color: white; /* Изменено для контраста */
+        }
+
+        .btn-remove {
+            background-color: #dc3545;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn-remove:hover {
+            background-color: #c82333;
+        }
+
+        .form-control {
+            border: 2px solid green;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #28a745;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            background: #218838;
+        }
+    </style>
+
+    <div class="background"></div>
+
+    <img src="/gear-chart-logo/O3IICD1.png" alt="Logo" class="logo">
 
     <h1>Новость:</h1>
 
-    <table>
+    <table class="table">
         <thead>
-            <tr>
-                <th> <h2>{{ newData.title }}</h2></th>
-            </tr>
+        <tr>
+            <th><h2 style="color: white;">{{ newData.title }}</h2></th>
+        </tr>
         </thead>
         <tbody>
-            <tr>
-                <th>
-                    <p>
-                        {{ newData.content.mainText }}
-                    </p>
-                </th>
-            </tr>
-            <tr>
-                <th>{{ newData.content.dateSending | date }}</th>
-            </tr>
-            <tr>
-                <th> {{ newData.content.author.access.email }}</th>
-            </tr>
+        <tr>
+            <th>
+                <p>
+                    {{ newData.content.mainText }}
+                </p>
+            </th>
+        </tr>
+        <tr>
+            <th>{{ newData.content.dateSending | date }}</th>
+        </tr>
+        <tr>
+            <th>{{ newData.content.author.access.email }}</th>
+        </tr>
         </tbody>
     </table>
 
     <h1>Комментарии:</h1>
     <h2>Написать комментарий:</h2>
 
-    {{ form(commentForm) }}
+    <form name="comment_form" method="post" class="mb-4">
+        <div class="form-group">
+            <label for="comment_form_text" class="required">Описание:</label>
+            <textarea id="comment_form_text" name="comment_form[text]" required="required" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+            <button type="submit" id="comment_form_submit" name="comment_form[submit]" class="btn btn-primary">Отправить</button>
+        </div>
+        <input type="hidden" id="comment_form__token" name="comment_form[_token]" value="e5db2253d.SBOAqg9VIuscJXyfj_fG534HyivsudLEjdzrHwRiAIg.PnnJznoGU7loXx_99aingEdxs37Y3JCi3runcXwVVN0sKtOSW2RR3EprDw" />
+    </form>
 
     {% if not(comments is empty) %}
-
-    <table>
-        <thead>
-        <tr>
-            <th>
-                комментарий
-            </th>
-            <th>
-                автор
-            </th>
-            <th>
-                дата
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Комментарий</th>
+                <th>Автор</th>
+                <th>Дата</th>
+                <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
             {% for comment in comments %}
-                <tr id = "row-{{ comment.content.id }}">
+                <tr id="row-{{ comment.content.id }}">
                     <th>{{ comment.content.mainText }}</th>
                     <th>{{ comment.content.author.access.email }}</th>
                     <th>{{ comment.content.dateSending | date }}</th>
                     {% if (not(user is empty)) and (user.email == comment.content.author.access.email) %}
-                        <th><button class="remove" id="{{ comment.content.id }}">Удалить</button></th>
+                        <th><button class="btn-remove remove" id="{{ comment.content.id }}">Удалить</button></th>
                     {% endif %}
                 </tr>
             {% endfor %}
-
-        {% else %}
-            <h4>Комментариев пока нет.</h4>
-        {% endif %}
-
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    {% else %}
+        <h4>Комментариев пока нет.</h4>
+    {% endif %}
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 
-
     {% block javascripts %}
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const buttons = document.querySelectorAll(".remove");
 
-        document.addEventListener('DOMContentLoaded', () => {
+                for (let i = 0; i < buttons.length; i++) {
+                    const button = buttons[i];
 
-            const buttons = document.querySelectorAll(".remove");
+                    button.addEventListener("click", function() {
+                        startAjax(button.id);
+                    });
+                }
 
-            for (let i = 0; i < buttons.length; i++) {
-                const button = buttons[i];
-
-                button.addEventListener("click", function() {
-                    startAjax(button.id);
-                });
-            }
-
-            function startAjax(id)
-            {
-
-                $.ajax({
-                    url: '/comments/remove/' + id,
-                    type: 'GET',
-                    success: function (response) {
-                        $("#row-" + id).remove();
-                    },
-                    error: function () {
-                        alert("error");
-                    }
-                });
-
-            }
-        });
-
+                function startAjax(id) {
+                    $.ajax({
+                        url: '/comments/remove/' + id,
+                        type: 'GET',
+                        success: function (response) {
+                            $("#row-" + id).remove();
+                        },
+                        error: function () {
+                            alert("error");
+                        }
+                    });
+                }
+            });
         </script>
     {% endblock %}
 

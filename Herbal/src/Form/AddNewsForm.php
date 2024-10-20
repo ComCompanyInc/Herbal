@@ -18,9 +18,9 @@ class AddNewsForm extends AbstractType
             ])
             ->add('text', TextareaType::class, [
                 'label' => 'Описание новости:'
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Отправить'
             ]);
+            //->add('submit', SubmitType::class, [
+                //'label' => 'Отправить'
+            //]);
     }
 }

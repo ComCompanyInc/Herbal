@@ -1,35 +1,212 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    <head>
+        <meta charset="UTF-8">
+        <title>Welcome!</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    </head>
 
+    {% include 'header/header.html.twig' %}
 
-    <button id="add-news">Создать свою новость</button>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Sans+MS&display=swap');
+
+        body {
+            font-family: 'Comic Sans MS', cursive;
+            background-color: #f8f9fa;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto; /* Добавлено для прокрутки */
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(45deg, rgba(40, 167, 69, 0.1) 25%, transparent 25%),
+            linear-gradient(-45deg, rgba(40, 167, 69, 0.1) 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, rgba(40, 167, 69, 0.1) 75%),
+            linear-gradient(-45deg, transparent 75%, rgba(40, 167, 69, 0.1) 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px, 10px 10px, 20px 20px;
+            z-index: -1;
+        }
+
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 150px;
+            height: auto;
+            opacity: 0;
+            animation: fadeIn 2s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #28a745;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            animation: slideIn 2s ease-in-out forwards;
+        }
+
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn-add-news {
+            background-color: #28a745;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            opacity: 0;
+            animation: fadeIn 2s ease-in-out 1s forwards;
+        }
+
+        .btn-add-news:hover {
+            background-color: #218838;
+        }
+
+        .table {
+            width: 100%;
+            margin-bottom: 1rem;
+            color: #212529;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            animation: fadeIn 2s ease-in-out 1.5s forwards;
+        }
+
+        .table th, .table td {
+            padding: 15px;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-read-more {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn-read-more:hover {
+            background-color: #0056b3;
+        }
+
+        .form-select {
+            border: 2px solid green;
+            border-radius: 10px;
+            padding: 10px;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: #28a745;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            background: #218838;
+        }
+    </style>
+
+    <div class="background"></div>
+
+    <img src="/gear-chart-logo/O3IICD1.png" alt="Logo" class="logo">
+
+    <button id="add-news" class="btn-add-news">Создать свою новость</button>
 
     <h1>Главное сегодня:</h1>
 
-    {{ form(sortForm) }}
+    <div class="d-flex justify-content-center mb-4">
+        <form name="news_form" method="post" class="d-flex align-items-center">
+            <div class="form-group">
+                <label for="news_form_name" class="required">По городу: </label>
+                <select id="news_form_name" name="news_form[name]" class="form-select">
+                    <option value="01925d9a-9def-79c9-b26e-8f71104e079a">Тверь</option>
+                    <option value="01925d9a-9def-79c9-b26e-8f71104e079b">Ржев</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" id="news_form_submit" name="news_form[submit]" class="btn btn-primary">Поиск новостей</button>
+            </div>
+            <input type="hidden" id="news_form__token" name="news_form[_token]" value="5ea4ed98a743441da58fce839e.-X3x3uuo_HFNahQWLlbnUp0Xy_xlpYkvtdNQdX929o0.mD-hkIjrjiB9XixzTwGJKtw6k5EG1L9ezJUeIEc3wNydT7K8hJiQNSwPVQ" />
+        </form>
+    </div>
 
-    <table>
+    <table class="table">
         <thead>
-            <tr>
-                <th>Заголовок</th>
-                <th>Новость</th>
-                <th>Дата публикации</th>
-                <th>Город издателя</th>
-            </tr>
+        <tr>
+            <th>Заголовок</th>
+            <th>Новость</th>
+            <th>Дата публикации</th>
+            <th>Город издателя</th>
+            <th>Действия</th>
+        </tr>
         </thead>
         <tbody>
-            {% for new in news %}
-                <tr>
-                    {% if new.content.isDelete == false %}
-                        <th>{{ new.title }}</th>
-                        <th>{{ new.content.mainText | slice(0, 150)}} ...</th>
-                        <th>{{ new.content.dateSending | date }}</th>
-                        <th>{{ new.content.author.country.name }}</th>
-                        <th><button class = "open-new" id="{{ new.id }}">Читать далее</button></th>
-                    {% endif %}
-                </tr>
-            {% endfor %}
+        {% for new in news %}
+            <tr>
+                {% if new.content.isDelete == false %}
+                    <th>{{ new.title }}</th>
+                    <th>{{ new.content.mainText | slice(0, 150)}} ...</th>
+                    <th>{{ new.content.dateSending | date }}</th>
+                    <th>{{ new.content.author.country.name }}</th>
+                    <th><button class="btn-read-more open-new" id="{{ new.id }}">Читать далее</button></th>
+                {% endif %}
+            </tr>
+        {% endfor %}
         </tbody>
     </table>
 

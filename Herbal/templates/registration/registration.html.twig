@@ -3,32 +3,67 @@
 {% block title %}Страница регистрации{% endblock %}
 
 {% block body %}
+    {% include 'header/header.html.twig' %}
+
     <head>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" >
+        <meta charset="UTF-8">
+        <title>Страница регистрации</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    </head>
 
     {% block stylesheets %}
         <style>
-            .content {
-                margin: 20px;
+            @import url('https://fonts.googleapis.com/css2?family=Comic+Sans+MS&display=swap');
+
+            body {
+                font-family: 'Comic Sans MS', cursive;
+                background-color: #f8f9fa;
                 padding: 20px;
-                border: 1px solid green;
-                border-radius: 10px;
-                background-color: #efefef;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                overflow-y: auto; /* Добавлено для прокрутки */
             }
 
-            .content {
-                padding: 5px;
-                border: 1px solid green;
-                border-radius: 5px;
+            .background {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image: linear-gradient(45deg, rgba(40, 167, 69, 0.1) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(40, 167, 69, 0.1) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(40, 167, 69, 0.1) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(40, 167, 69, 0.1) 75%);
+                background-size: 20px 20px;
+                background-position: 0 0, 10px 10px, 10px 10px, 20px 20px;
+                z-index: -1;
+            }
+
+            .logo {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                width: 150px;
+                height: auto;
+                opacity: 0;
+                animation: fadeIn 2s ease-in-out forwards;
+            }
+
+            @keyframes fadeIn {
+                0% {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
             }
 
             .centered {
                 text-align: center;
-            }
-
-            .object {
-                padding-left: 20px;
-                padding-right: 20px;
             }
 
             .green-color {
@@ -49,59 +84,108 @@
                 width: 100vw;
                 background-size: cover;
                 background-attachment: fixed;
-                #object-fit: cover;
             }
 
-            #back {
-                background-image: url('cells.avif');
+            .content {
+                width: 100%;
+                max-width: 600px;
+                background-color: #fff;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                opacity: 0;
+                animation: fadeIn 2s ease-in-out 1s forwards;
             }
 
+            .form-control {
+                background: rgba(255, 255, 255, 0.1);
+                border: 2px solid green;
+                color: #212529;
+                border-radius: 10px;
+                padding: 15px;
+            }
+
+            .form-control:focus {
+                background: rgba(255, 255, 255, 0.2);
+                color: #212529;
+                border-color: #28a745;
+                box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
+            }
+
+            .btn-primary {
+                background: #28a745;
+                border: none;
+                border-radius: 10px;
+                padding: 15px;
+                width: 100%;
+                font-size: 18px;
+                font-weight: bold;
+            }
+
+            .btn-primary:hover {
+                background: #218838;
+            }
         </style>
     {% endblock %}
 
-    </head>
+    <div class="background"></div>
 
+    <div id="back-img"></div>
 
+    <div class="centered">
+        <br/>
+        <h1 class="green-color" id="name-com">HERBAL</h1>
+        <img class="mb-4" src="/gear-chart-logo/O3IICD1.png" alt="" width="200" height="200">
+    </div>
 
-        <div id="back-img">
+    <div class="content">
+        <h1 class="h3 mb-3 fw-normal green-color">Регистрация:</h1>
 
-        </div>
+        <div class="object">
+            {% if notification != null %}
+                <div class="green-color">
+                    <b>{{ notification }}</b>
+                </div>
+            {% endif %}
 
-        <div class="centered" id ="back">
-            <br/>
-
-            <h1 class="green-color" id="name-com">HERBAL</h1>
-
-            <img class="mb-4" src="/gear-chart-logo/O3IICD1.png" alt="" width="200" height="200">
-        </div>
-
-        <div class = "content">
-
-            <h1 class = "h3 mb-3 fw-normal">Регистрация:</h1>
-
-            <div class="object">
-
-                {% if notification != null %}
-                    <div class="green-color">
-                        <b>
-                            {{ notification }}
-                        </b>
-                    </div>
-                {% endif %}
-
-                {{ form(registrationForm) }}
-
-                <button class=" btn btn-primary btn-lg mt-2" id="sign-in">
-                    Войти
-                </button>
-
+            {{ form_start(registrationForm, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+            <div class="mb-3">
+                {{ form_label(registrationForm.name, 'Имя', {'label_attr': {'class': 'form-label text-shadow'}}) }}
+                {{ form_widget(registrationForm.name, {'attr': {'class': 'form-control'}}) }}
             </div>
+            <div class="mb-3">
+                {{ form_label(registrationForm.surname, 'Фамилия', {'label_attr': {'class': 'form-label text-shadow'}}) }}
+                {{ form_widget(registrationForm.surname, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(registrationForm.patronymic, 'Отчество', {'label_attr': {'class': 'form-label text-shadow'}}) }}
+                {{ form_widget(registrationForm.patronymic, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(registrationForm.dateOfBirth, 'Дата рождения', {'label_attr': {'class': 'form-label text-shadow'}}) }}
+                {{ form_widget(registrationForm.dateOfBirth, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(registrationForm.country, 'Город', {'label_attr': {'class': 'form-label text-shadow'}}) }}
+                {{ form_widget(registrationForm.country, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(registrationForm.email, 'E-mail', {'label_attr': {'class': 'form-label text-shadow'}}) }}
+                {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(registrationForm.password, 'Пароль', {'label_attr': {'class': 'form-label text-shadow'}}) }}
+                {{ form_widget(registrationForm.password, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg mt-3">Зарегистрироваться</button>
+            {{ form_end(registrationForm) }}
 
+            <button class="btn btn-primary btn-lg mt-2" id="sign-in">Войти</button>
         </div>
+    </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 
     {% block javascripts %}
         <script>

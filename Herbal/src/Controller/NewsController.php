@@ -77,6 +77,8 @@ class NewsController extends AbstractController
             $news->setContent($content);
             $this->entityManager->persist($news);
             $this->entityManager->flush();
+
+            return $this->redirectToRoute('news');
         }
 
         return $this->render('news/addNews.html.twig', [
@@ -98,7 +100,6 @@ class NewsController extends AbstractController
             $this->entityManager->getRepository(News::class)->findOneBy(['id' => $id])
         );
 
-        //dd($comments);
         $idAccess = null;
 
         try {

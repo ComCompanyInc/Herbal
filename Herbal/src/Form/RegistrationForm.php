@@ -46,11 +46,11 @@ class RegistrationForm extends AbstractType
             ->add('password', PasswordType::class, [
                 'label' => 'Пароль: ',
                 'attr' => ['class' => 'form-control'],
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => "Регистрироваться",
-                'attr' => ['class' => 'btn btn-primary btn-lg mt-3'],
             ]);
+            //->add('submit', SubmitType::class, [
+              //  'label' => "Регистрироваться",
+                //'attr' => ['class' => 'btn btn-primary btn-lg mt-3'],
+            //]);
     }
 
     /*public function configureOptions(OptionsResolver $resolver): void
