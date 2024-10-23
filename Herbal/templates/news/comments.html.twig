@@ -176,7 +176,12 @@
     <h1>Комментарии:</h1>
     <h2>Написать комментарий:</h2>
 
-    <form name="comment_form" method="post" class="mb-4">
+    {% if isAuthored == true %}
+            {{ form(commentForm) }}
+        {% else %}
+            <h3> <i>чтобы добавить комментарий необходимо авторизоваться</i> </h3>
+    {% endif %}
+    {# <form name="comment_form" method="post" class="mb-4">
         <div class="form-group">
             <label for="comment_form_text" class="required">Описание:</label>
             <textarea id="comment_form_text" name="comment_form[text]" required="required" class="form-control"></textarea>
@@ -185,7 +190,7 @@
             <button type="submit" id="comment_form_submit" name="comment_form[submit]" class="btn btn-primary">Отправить</button>
         </div>
         <input type="hidden" id="comment_form__token" name="comment_form[_token]" value="e5db2253d.SBOAqg9VIuscJXyfj_fG534HyivsudLEjdzrHwRiAIg.PnnJznoGU7loXx_99aingEdxs37Y3JCi3runcXwVVN0sKtOSW2RR3EprDw" />
-    </form>
+    </form> #}
 
     {% if not(comments is empty) %}
         <table class="table">

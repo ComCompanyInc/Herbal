@@ -19,7 +19,7 @@ class CommentForm extends AbstractType
                 'label' => 'Описание:'
             ])
             ->add('submit', SubmitType::class, [
-                'label' => 'Отправить'
+                'label' => 'Отправить1'
             ]);
     }
 }

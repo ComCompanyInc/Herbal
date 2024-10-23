@@ -24,6 +24,7 @@ use Throwable;
 class NewsController extends AbstractController
 {
     public EntityManagerInterface $entityManager;
+    private bool $isAuthored = false;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
@@ -60,6 +61,22 @@ class NewsController extends AbstractController
         $addNewsForm = $this->createForm(addNewsForm::class);
         $addNewsForm->handleRequest($request);
 
+        $idAccess = null;
+
+        // Проверяем, что пользователь аутентифицирован
+        if ($this->getUser() !== null) {
+            try {
+                $idAccess = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+                $idUser = $this->entityManager->getRepository(User::class)->findOneBy(['access' => $idAccess]);
+
+                $this->isAuthored = true;
+            } catch (\Exception $e) {
+                $idAccess = null;
+
+                $this->isAuthored = false;
+            }
+        }
+
         if ($addNewsForm->isSubmitted() && $addNewsForm->isValid()) {
             $addNewsFormData = $addNewsForm->getData();
 
@@ -83,6 +100,7 @@ class NewsController extends AbstractController
 
         return $this->render('news/addNews.html.twig', [
             'addNewsForm' => $addNewsForm,
+            'isAuthored' => $this->isAuthored,
         ]);
     }
 
@@ -100,13 +118,29 @@ class NewsController extends AbstractController
             $this->entityManager->getRepository(News::class)->findOneBy(['id' => $id])
         );
 
-        $idAccess = null;
+        /*$idAccess = null;
 
         try {
             $idAccess = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
             $idUser = $this->entityManager->getRepository(User::class)->findOneBy(['access' => $idAccess]);
         } catch (\Exception $e) {
             $idAccess = null;
+        }*/
+
+        $idAccess = null;
+
+// Проверяем, что пользователь аутентифицирован
+        if ($this->getUser() !== null) {
+            try {
+                $idAccess = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+                $idUser = $this->entityManager->getRepository(User::class)->findOneBy(['access' => $idAccess]);
+
+                $this->isAuthored = true;
+            } catch (\Exception $e) {
+                $idAccess = null;
+
+                $this->isAuthored = false;
+            }
         }
 
         if($commentForm->isSubmitted() && $commentForm->isValid())
@@ -137,7 +171,8 @@ class NewsController extends AbstractController
             'user' => $idAccess,
             'newData' => $newData,
             'commentForm' => $commentForm,
-            'comments' => $comments
+            'comments' => $comments,
+            'isAuthored' => $this->isAuthored
         ]);
     }
 

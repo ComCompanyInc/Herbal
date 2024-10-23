@@ -136,7 +136,12 @@
             {{ form_label(addNewsForm.text, 'Описание новости', {'label_attr': {'class': 'form-label text-shadow'}}) }}
             {{ form_widget(addNewsForm.text, {'attr': {'class': 'form-control', 'rows': '5'}}) }}
         </div>
-        <button type="submit" class="btn btn-primary">Добавить новость</button>
+        {% if isAuthored == true %}
+            <button type="submit" class="btn btn-primary">Добавить новость</button>
+        {% else %}
+            <h3> <i>Для добавления новости необходимо авторизоваться</i> </h3>
+        {% endif %}
+
         {{ form_end(addNewsForm) }}
     </div>
 

@@ -169,7 +169,8 @@
 
     <h1>Главное сегодня:</h1>
 
-    <div class="d-flex justify-content-center mb-4">
+    {{ form(sortForm) }}
+    {# <div class="d-flex justify-content-center mb-4">
         <form name="news_form" method="post" class="d-flex align-items-center">
             <div class="form-group">
                 <label for="news_form_name" class="required">По городу: </label>
@@ -183,7 +184,7 @@
             </div>
             <input type="hidden" id="news_form__token" name="news_form[_token]" value="5ea4ed98a743441da58fce839e.-X3x3uuo_HFNahQWLlbnUp0Xy_xlpYkvtdNQdX929o0.mD-hkIjrjiB9XixzTwGJKtw6k5EG1L9ezJUeIEc3wNydT7K8hJiQNSwPVQ" />
         </form>
-    </div>
+    </div>  #}
 
     <table class="table">
         <thead>
