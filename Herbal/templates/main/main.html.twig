@@ -1,0 +1,302 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <!DOCTYPE html>
+    <html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добро пожаловать в Новостную Ленту</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background: #ffffff;
+            background: linear-gradient(135deg, #ffffff, #f0fff0);
+            font-family: 'Comic Sans MS', cursive;
+            color: #333;
+            position: relative;
+            overflow-x: hidden;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="none"><rect width="100" height="100" fill="white"/><path d="M0 0L100 100M100 0L0 100" stroke="rgba(0, 128, 0, 0.3)" stroke-width="1"/></svg>');
+            background-size: 20px 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            animation: fadeInDown 1s ease-out;
+            transition: transform 0.3s ease;
+            width: 100%;
+        }
+
+        .header:hover {
+            transform: scale(1.05);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            color: #4caf50;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            transition: color 0.3s ease;
+        }
+
+        .header h1:hover {
+            color: #81c784;
+        }
+
+        .btn-custom {
+            background: linear-gradient(45deg, #81c784, #4caf50);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 1.2rem;
+            margin: 5px;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            animation: fadeInUp 1s ease-out;
+            transition: transform 0.3s ease;
+            width: 100%;
+        }
+
+        .info-box:hover {
+            transform: scale(1.05);
+        }
+
+        .info-box h2 {
+            color: #4caf50;
+            transition: color 0.3s ease;
+        }
+
+        .info-box h2:hover {
+            color: #81c784;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .floating-icon {
+            position: absolute;
+            animation: float 5s infinite ease-in-out;
+            font-size: 2rem;
+            color: #81c784;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .image-carousel {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-carousel img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .image-carousel img.active {
+            opacity: 1;
+        }
+
+        .additional-info {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            animation: fadeInUp 1s ease-out;
+            transition: transform 0.3s ease;
+            width: 100%;
+        }
+
+        .additional-info:hover {
+            transform: scale(1.05);
+        }
+
+        .additional-info h3 {
+            color: #4caf50;
+            transition: color 0.3s ease;
+        }
+
+        .additional-info h3:hover {
+            color: #81c784;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .info-box, .additional-info {
+                padding: 15px;
+            }
+
+            .image-carousel {
+                height: 300px;
+            }
+        }
+
+        .row-equal-height {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: stretch;
+        }
+
+        .row-equal-height > [class*='col-'] {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            color: #4caf50;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            animation: logoAnimation 2s infinite ease-in-out;
+        }
+
+        @keyframes logoAnimation {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logo">🌿</div>
+
+    <div class="header text-center">
+        <h1>Добро пожаловать в Новостную Ленту</h1>
+        <div class="mt-4">
+            <a href="/news" class="btn btn-custom">Главная</a>
+            <a href="/login" class="btn btn-custom">Войти</a>
+            <a href="/registration" class="btn btn-custom">Зарегистрироваться</a>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="info-box text-center">
+                <h2>О нашей системе</h2>
+                <p>Новостная Лента — это современная платформа для получения актуальных новостей. Мы стремимся предоставить вам самую свежую и интересную информацию.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="image-carousel">
+                <img src="https://dengi.bm.img.com.ua/dengi/orig/9/68/df958bc1d296d0bce3981c9798d6c689.jpg?text=Image+1" alt="Image 1" class="active">
+                <img src="https://cdnn21.img.ria.ru/images/07e6/0a/13/1825061804_0:120:2730:1656_1920x0_80_0_0_4007437def0a1b8da481869d0a78010d.jpg?text=Image+2" alt="Image 2">
+                <img src="https://mns73.ru/base/data/2606mid.jpg?text=Image+3" alt="Image 3">
+                <img src="https://rosretail.com/storage/uploads/towers/71/images/1689942686_64.jpg?text=Image+4" alt="Image 4">
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5 row-equal-height">
+        <div class="col-md-6">
+            <div class="additional-info">
+                <h3>Наши преимущества</h3>
+                <ul>
+                    <li>Актуальные новости</li>
+                    <li>Удобный интерфейс</li>
+                    <li>Многоязычность</li>
+                    <li>Безопасность данных</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="additional-info">
+                <h3>Как это работает</h3>
+                <p>Просто зарегистрируйтесь, выберите интересные вам категории новостей и получайте актуальную информацию каждый день.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="floating-icon" style="top: 10%; left: 10%;">🌿</div>
+    <div class="floating-icon" style="top: 20%; right: 10%;">🌱</div>
+    <div class="floating-icon" style="bottom: 10%; left: 20%;">🍃</div>
+    <div class="floating-icon" style="bottom: 20%; right: 20%;">🌾</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+        const images = $('.image-carousel img');
+        let currentIndex = 0;
+
+        function showNextImage() {
+            images.removeClass('active');
+            currentIndex = (currentIndex + 1) % images.length;
+            images.eq(currentIndex).addClass('active');
+        }
+
+        setInterval(showNextImage, 5000);
+    });
+</script>
+</body>
+</html>
+{% endblock %}

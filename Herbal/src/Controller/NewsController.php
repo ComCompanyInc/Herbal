@@ -31,6 +31,12 @@ class NewsController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
+    #[Route('/', name: 'main')]
+    public function mainPage(): Response
+    {
+        return $this->render('main/main.html.twig');
+    }
+
     #[Route('/news', name: 'news')]
     public function newsAction(Request $request) :Response
     {
