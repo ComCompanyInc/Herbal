@@ -34,7 +34,7 @@ class NewsController extends AbstractController
     #[Route('/news', name: 'news')]
     public function newsAction(Request $request) :Response
     {
-        $news = $this->entityManager->getRepository(News::class)->findAll();
+        $news = $this->entityManager->getRepository(News::class)->findAllWithOrderBy();
 
         $registrationForm = $this->createForm(NewsForm::class);
         $registrationForm->handleRequest($request);

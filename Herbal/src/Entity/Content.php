@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ContentRepository::class)]
 class Content
@@ -23,7 +24,8 @@ class Content
     #[ORM\JoinColumn(nullable: false)]
     private ?User $author = null;
 
-    #[ORM\Column(length: 8000)]
+    #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotNull]
     private ?string $mainText = null;
 
     #[ORM\Column]
@@ -35,7 +37,7 @@ class Content
     #[ORM\OneToMany(targetEntity: News::class, mappedBy: 'content', orphanRemoval: true)]
     private Collection $news;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateSending = null;
 
     /**

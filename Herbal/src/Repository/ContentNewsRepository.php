@@ -49,8 +49,9 @@ class ContentNewsRepository extends ServiceEntityRepository
             ->join('cont.author', 'author')
             ->join('c.news', 'new')
             ->join('new.content', 'newCont')
-            ->where('(c.news = :idNews) AND (cont.isDelete = false)') //AND (cont.isDelete = false)
+            ->where('(c.news = :idNews) AND (cont.isDelete = false)')
             ->setParameter('idNews', $idNews)
+            ->orderBy('cont.dateSending', 'DESC')
             ->getQuery()
             ->getResult();
     }

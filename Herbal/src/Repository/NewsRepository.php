@@ -51,6 +51,17 @@ class NewsRepository extends ServiceEntityRepository
             ->join('a.country', 'country')
             ->where('country.name = :cityName')
             ->setParameter('cityName', $cityName)
+            ->orderBy('c.dateSending', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllWithOrderBy()
+    {
+        return $this->createQueryBuilder('n')
+            ->select('n')
+            ->join('n.content', 'c')
+            ->orderBy('c.dateSending', 'DESC')
             ->getQuery()
             ->getResult();
     }
