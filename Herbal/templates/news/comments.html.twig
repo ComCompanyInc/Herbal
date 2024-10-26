@@ -106,7 +106,7 @@
             color: white; /* Изменено для контраста */
         }
 
-        .btn-remove {
+        .btn-remove, .remove-news {
             background-color: #dc3545;
             border: none;
             color: white;
@@ -169,6 +169,11 @@
         </tr>
         <tr>
             <th>{{ newData.content.author.access.email }}</th>
+        </tr>
+        <tr>
+            {% if (not(user is empty)) and (user.email == newData.content.author.access.email) %}
+                <th><button data-text="news" class="btn-remove remove" id="{{ newData.content.id }}">Удалить новость</button></th>
+            {% endif %}
         </tr>
         </tbody>
     </table>
@@ -233,6 +238,18 @@
 
                     button.addEventListener("click", function() {
                         startAjax(button.id);
+
+                        // Проверяем, существует ли элемент и есть ли у него атрибут data-text
+                        if (button && button.hasAttribute('data-text')) {
+                            // Получаем значение атрибута data-text
+                            let dataText = button.getAttribute('data-text');
+
+                            // Проверяем, равно ли значение 'news'
+                            if (dataText === 'news') {
+                                // Перебрасываем пользователя на другую страницу
+                                window.location.href = '/news';
+                            }
+                        }
                     });
                 }
 
