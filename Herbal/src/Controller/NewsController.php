@@ -40,22 +40,27 @@ class NewsController extends AbstractController
     #[Route('/news', name: 'news')]
     public function newsAction(Request $request) :Response
     {
-        $news = $this->entityManager->getRepository(News::class)->findAllWithOrderBy();
+        //если у текущего пользователя в БД is_verified == false, то выходим из аккаунта
+        if($this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()])->getIsVerified() == false) {
+            return $this->redirectToRoute('app_logout');
+        } else {
 
-        $registrationForm = $this->createForm(NewsForm::class);
-        $registrationForm->handleRequest($request);
+            $news = $this->entityManager->getRepository(News::class)->findAllWithOrderBy();
 
-        if($registrationForm->isSubmitted() && $registrationForm->isValid())
-        {
-            $formData = $registrationForm->getData();
+            $registrationForm = $this->createForm(NewsForm::class);
+            $registrationForm->handleRequest($request);
 
-            $news = $this->entityManager->getRepository(News::class)->findByCity($formData['name']);
+            if ($registrationForm->isSubmitted() && $registrationForm->isValid()) {
+                $formData = $registrationForm->getData();
+
+                $news = $this->entityManager->getRepository(News::class)->findByCity($formData['name']);
+            }
+
+            return $this->render('news/news.html.twig', [
+                'sortForm' => $registrationForm,
+                'news' => $news
+            ]);
         }
-
-        return $this->render('news/news.html.twig', [
-            'sortForm' => $registrationForm,
-            'news' => $news
-        ]);
     }
 
     #[Route('/addNews', name: 'addNews')]

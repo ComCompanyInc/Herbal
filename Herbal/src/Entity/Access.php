@@ -15,6 +15,37 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: AccessRepository::class)]
 class Access implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    #[ORM\Column(type: 'boolean')]
+    private bool $isVerified = false;
+
+    public function getIsVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): self
+    {
+        $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $registrationToken;
+
+    // Геттеры и сеттеры
+    public function getRegistrationToken(): ?string
+    {
+        return $this->registrationToken;
+    }
+
+    public function setRegistrationToken(?string $registrationToken): self
+    {
+        $this->registrationToken = $registrationToken;
+
+        return $this;
+    }
+
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]

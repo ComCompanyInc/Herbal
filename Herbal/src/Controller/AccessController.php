@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Access;
+/*use App\Entity\Access;
 use App\Entity\User;
 use App\Form\RegistrationForm;
 use DateTime;
@@ -11,7 +11,23 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Attribute\Route;*/
+
+use App\Entity\Access;
+use App\Entity\Country;
+use App\Entity\User;
+use App\Form\RegistrationForm;
+use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
 class AccessController extends AbstractController
 {
@@ -23,11 +39,11 @@ class AccessController extends AbstractController
     }
 
     #[Route('/registration', name: 'registration')]
-    function registrationAction(Request $request, UserPasswordHasherInterface $passwordHasher): Response
+    public function registrationAction(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer, TokenGeneratorInterface $tokenGenerator): Response
     {
         $notification = null;
 
-        $registrationForm = $this->createForm(registrationForm::class);
+        $registrationForm = $this->createForm(RegistrationForm::class);
         $registrationForm->handleRequest($request);
 
         if ($registrationForm->isSubmitted() && $registrationForm->isValid()) {
@@ -36,19 +52,18 @@ class AccessController extends AbstractController
             $access = new Access();
             $user = new User();
 
-            //dd($registrationData['email']);
-
-            if(
-                is_null($this->entityManager->getRepository(Access::class)->findOneBy(
-                        ['email' => $registrationData['email']]
-                    )
-                )
-            ) {
+            if (is_null($this->entityManager->getRepository(Access::class)->findOneBy(['email' => $registrationData['email']]))) {
                 $access->setEmail($registrationData['email']);
-                $access->setPassword($passwordHasher->hashPassword(new Access(), $registrationData['password']));
+                $access->setPassword($passwordHasher->hashPassword($access, $registrationData['password']));
+
+                // Генерация токена
+                $token = $tokenGenerator->generateToken();
+                $access->setRegistrationToken($token);
+
                 $this->entityManager->persist($access);
                 $this->entityManager->flush();
 
+                //запись пользователя
                 $idAccess = $this->entityManager->getRepository(Access::class)->findOneBy(
                     ['email' => $registrationData['email']]
                 );
@@ -64,16 +79,46 @@ class AccessController extends AbstractController
                 $this->entityManager->persist($user);
                 $this->entityManager->flush();
 
-                $notification = "Вы успешно зарегестрированны!";
+                // Отправка письма с токеном
+                $email = (new Email())
+                    ->from('mailbox33m@mail.ru')
+                    ->to($registrationData['email'])
+                    ->subject('Подтверждение регистрации')
+                    ->html($this->renderView('emails/registration.html.twig', [
+                        'token' => $token,
+                    ]));
+
+                $mailer->send($email);
+
+                $notification = "Письмо с подтверждением отправлено на ваш email.";
             } else {
-                //TODO: генерируем сообщение что нельзя создать аккаунт с такой почтой
-                return new Response('аккаунт с такой почтой уже существует!');
+                $notification = "Аккаунт с такой почтой уже существует!";
             }
         }
 
         return $this->render('registration/registration.html.twig', [
-            'registrationForm' => $registrationForm,
+            'registrationForm' => $registrationForm->createView(),
             'notification' => $notification,
         ]);
+    }
+
+    #[Route('/verify-email/{token}', name: 'verify_email')]
+    public function verifyEmail(string $token): Response
+    {
+        $access = $this->entityManager->getRepository(Access::class)->findOneBy(['registrationToken' => $token]);
+
+        if (!$access) {
+            throw $this->createNotFoundException('Неверный токен.');
+        }
+
+        // Подтверждение регистрации
+        $access->setRegistrationToken(null);
+        $access->setIsVerified(true);
+
+        $this->entityManager->flush();
+
+        $this->addFlash('success', 'Ваш email успешно подтвержден.');
+
+        return $this->redirectToRoute('app_login');
     }
 }
