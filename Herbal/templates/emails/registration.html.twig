@@ -1,5 +1,57 @@
+{# <h1>Подтверждение регистрации</h1>
+
+<p>Для завершения регистрации, пожалуйста, перейдите по ссылке:</p>
+
+<a href="{{ url('verify_email', {'token': token}) }}">Подтвердить email</a> #}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подтверждение регистрации</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive;
+            background-color: #d0f0c0; /* Светло-зеленый фон */
+            color: #006400; /* Темно-зеленый текст */
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+        }
+        a {
+            font-size: 1.2em;
+            color: #006400;
+            text-decoration: none;
+            background-color: #90ee90; /* Светло-зеленый фон для ссылки */
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        a:hover {
+            background-color: #32cd32; /* Ярко-зеленый фон при наведении */
+        }
+        .welcome-image {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="welcome-image">
+    <img src="https://cdn.fishki.net/upload/post/2016/05/26/1962736/6c054a6dc934490fecb6e3e26569685d.jpg" alt="Приветственное изображение" width="300">
+</div>
+
 <h1>Подтверждение регистрации</h1>
 
 <p>Для завершения регистрации, пожалуйста, перейдите по ссылке:</p>
 
 <a href="{{ url('verify_email', {'token': token}) }}">Подтвердить email</a>
+</body>
+</html>

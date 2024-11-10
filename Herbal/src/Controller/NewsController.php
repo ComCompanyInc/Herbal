@@ -12,6 +12,7 @@ use App\Form\CommentForm;
 use App\Form\NewsForm;
 use App\Repository\ContentNewsRepository;
 use App\Repository\NewsRepository;
+use App\Service\NewsService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -40,27 +41,31 @@ class NewsController extends AbstractController
     #[Route('/news', name: 'news')]
     public function newsAction(Request $request) :Response
     {
+        $user = $this->getUser();
+        $currentVerifyUser = null;
+
+        $newsService = new NewsService();
+        $result = [];
+
+        $registrationForm = $this->createForm(NewsForm::class);
+
         //если у текущего пользователя в БД is_verified == false, то выходим из аккаунта
-        if($this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()])->getIsVerified() == false) {
-            return $this->redirectToRoute('app_logout');
-        } else {
+        if ($user) {
+            $currentVerifyUser = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()])->getIsVerified();
 
-            $news = $this->entityManager->getRepository(News::class)->findAllWithOrderBy();
-
-            $registrationForm = $this->createForm(NewsForm::class);
-            $registrationForm->handleRequest($request);
-
-            if ($registrationForm->isSubmitted() && $registrationForm->isValid()) {
-                $formData = $registrationForm->getData();
-
-                $news = $this->entityManager->getRepository(News::class)->findByCity($formData['name']);
+            if ($currentVerifyUser == false) {
+                return $this->redirectToRoute('app_logout');
+            } else {
+                $result = $newsService->getNews($this->entityManager, $request, $registrationForm);
             }
-
-            return $this->render('news/news.html.twig', [
-                'sortForm' => $registrationForm,
-                'news' => $news
-            ]);
+        } else {
+            $result = $newsService->getNews($this->entityManager, $request, $registrationForm);
         }
+
+        return $this->render('news/news.html.twig', [
+            'sortForm' => $result['registrationForm'],//$registrationForm,
+                'news' => $result['news']//$news
+            ]);
     }
 
     #[Route('/addNews', name: 'addNews')]
