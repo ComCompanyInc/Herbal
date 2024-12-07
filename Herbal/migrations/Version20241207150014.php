@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20241109181549 extends AbstractMigration
+final class Version20241207150014 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,8 +20,10 @@ final class Version20241109181549 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE access (id UUID NOT NULL, is_verified BOOLEAN NOT NULL, registration_token VARCHAR(255) DEFAULT NULL, email VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE access (id UUID NOT NULL, role_id UUID NOT NULL, is_verified BOOLEAN NOT NULL, registration_token VARCHAR(255) DEFAULT NULL, email VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX IDX_6692B54D60322AC ON access (role_id)');
         $this->addSql('COMMENT ON COLUMN access.id IS \'(DC2Type:uuid)\'');
+        $this->addSql('COMMENT ON COLUMN access.role_id IS \'(DC2Type:uuid)\'');
         $this->addSql('CREATE TABLE content (id UUID NOT NULL, author_id UUID NOT NULL, main_text TEXT NOT NULL, is_delete BOOLEAN NOT NULL, date_sending TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_FEC530A9F675F31B ON content (author_id)');
         $this->addSql('COMMENT ON COLUMN content.id IS \'(DC2Type:uuid)\'');
@@ -51,6 +53,7 @@ final class Version20241109181549 extends AbstractMigration
         $this->addSql('COMMENT ON COLUMN "user".id IS \'(DC2Type:uuid)\'');
         $this->addSql('COMMENT ON COLUMN "user".country_id IS \'(DC2Type:uuid)\'');
         $this->addSql('COMMENT ON COLUMN "user".access_id IS \'(DC2Type:uuid)\'');
+        $this->addSql('ALTER TABLE access ADD CONSTRAINT FK_6692B54D60322AC FOREIGN KEY (role_id) REFERENCES role (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE content ADD CONSTRAINT FK_FEC530A9F675F31B FOREIGN KEY (author_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE content_news ADD CONSTRAINT FK_D0B1749584A0A3ED FOREIGN KEY (content_id) REFERENCES content (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE content_news ADD CONSTRAINT FK_D0B17495B5A459A0 FOREIGN KEY (news_id) REFERENCES news (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -65,6 +68,7 @@ final class Version20241109181549 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE SCHEMA public');
+        $this->addSql('ALTER TABLE access DROP CONSTRAINT FK_6692B54D60322AC');
         $this->addSql('ALTER TABLE content DROP CONSTRAINT FK_FEC530A9F675F31B');
         $this->addSql('ALTER TABLE content_news DROP CONSTRAINT FK_D0B1749584A0A3ED');
         $this->addSql('ALTER TABLE content_news DROP CONSTRAINT FK_D0B17495B5A459A0');

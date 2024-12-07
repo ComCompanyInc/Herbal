@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;*/
 
 use App\Entity\Access;
 use App\Entity\Country;
+use App\Entity\Role;
 use App\Entity\User;
 use App\Form\RegistrationForm;
 use DateTime;
@@ -51,8 +52,24 @@ class AccessController extends AbstractController
 
             $access = new Access();
             $user = new User();
+            $role = new Role();
 
             if (is_null($this->entityManager->getRepository(Access::class)->findOneBy(['email' => $registrationData['email']]))) {
+
+                //создание роли пользователя (по умолчанию: пользователь)
+                $roleName = $this->entityManager->getRepository(Role::class)->findOneBy(
+                    ['type' => 'Пользователь']
+                );
+
+                if(!isset($roleName)){
+                    $role->setType('Пользователь');
+                    $this->entityManager->persist($role);
+                    $this->entityManager->flush();
+
+                    $roleName = $role;
+                }
+
+                $access->setRole($roleName);
                 $access->setEmail($registrationData['email']);
                 $access->setPassword($passwordHasher->hashPassword($access, $registrationData['password']));
 

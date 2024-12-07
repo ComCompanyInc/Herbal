@@ -68,6 +68,10 @@ class Access implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'access', orphanRemoval: true)]
     private Collection $users;
 
+    #[ORM\ManyToOne(inversedBy: 'accesses')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Role $role = null;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -147,5 +151,17 @@ class Access implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // TODO: Implement getUserIdentifier() method.
         return $this->email;
+    }
+
+    public function getRole(): ?Role
+    {
+        return $this->role;
+    }
+
+    public function setRole(?Role $role): static
+    {
+        $this->role = $role;
+
+        return $this;
     }
 }
