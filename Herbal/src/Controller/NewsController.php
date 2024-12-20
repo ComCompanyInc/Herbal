@@ -24,6 +24,11 @@ use Throwable;
 
 class NewsController extends AbstractController
 {
+    const ACCESS_TYPES = [
+      'Пользователь',
+      'Администратор'
+    ];
+
     public EntityManagerInterface $entityManager;
     private bool $isAuthored = false;
 
@@ -68,8 +73,8 @@ class NewsController extends AbstractController
             ]);
     }
 
-    #[Route('/addNews', name: 'addNews')]
-    public function addNewsAction(Request $request): Response
+    #[Route('/addNews/{idNews}', name: 'addNews')]
+    public function addNewsAction(Request $request, string $idNews = null): Response
     {
         $news = new News();
         $content = new Content();
@@ -93,7 +98,17 @@ class NewsController extends AbstractController
             }
         }
 
-        if ($addNewsForm->isSubmitted() && $addNewsForm->isValid()) {
+        //заголовок и текст для редактирования новости
+        $titleForEdit = "";
+        $textForEdit = "";
+
+        if ($idNews != null) {
+            $titleForEdit = $this->entityManager->getRepository(News::class)->findOneBy(['content' => $idNews])->getTitle();
+            $textForEdit = $this->entityManager->getRepository(News::class)->findOneBy(['content' => $idNews])->getContent()->getMainText();
+        }
+
+        //если нажата кнопка "Сохранить новость" - сохраняем новость
+        if (($addNewsForm->isSubmitted() && $addNewsForm->isValid()) && ($idNews == null || $idNews == "")) {
             $addNewsFormData = $addNewsForm->getData();
 
             $idAccess = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
@@ -112,11 +127,24 @@ class NewsController extends AbstractController
             $this->entityManager->flush();
 
             return $this->redirectToRoute('news');
+        } else if(($addNewsForm->isSubmitted() && $addNewsForm->isValid()) && ($idNews != null || $idNews != "")) { // иначе если ключ от новости есть и нажата кнопка редактирования новости, редактируем новость
+            $addNewsFormData = $addNewsForm->getData();
+
+            $currentNews = $this->entityManager->getRepository(News::class)->findOneBy(['content' => $idNews]);
+            $currentNews->setTitle($addNewsFormData['title'] . ' (ред.)');
+            $currentNews->getContent()->setMainText($addNewsFormData['text']);
+            $this->entityManager->persist($currentNews);
+            $this->entityManager->flush();
+
+            return $this->redirectToRoute('comments', ['id' => $this->entityManager->getRepository(News::class)->findOneBy(['content' => $idNews])->getId()]);
         }
 
         return $this->render('news/addNews.html.twig', [
             'addNewsForm' => $addNewsForm,
             'isAuthored' => $this->isAuthored,
+            'idNews' => $idNews,
+            'titleForEdit' => $titleForEdit,
+            'textForEdit' => $textForEdit,
         ]);
     }
 
@@ -145,11 +173,14 @@ class NewsController extends AbstractController
 
         $idAccess = null;
 
+        $userRole = null; // переменная, хранящая роль пользователя
 // Проверяем, что пользователь аутентифицирован
         if ($this->getUser() !== null) {
             try {
                 $idAccess = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
                 $idUser = $this->entityManager->getRepository(User::class)->findOneBy(['access' => $idAccess]);
+
+                $userRole = $idUser->getAccess()->getRole()->getType();
 
                 $this->isAuthored = true;
             } catch (\Exception $e) {
@@ -157,6 +188,8 @@ class NewsController extends AbstractController
 
                 $this->isAuthored = false;
             }
+
+
         }
 
         if($commentForm->isSubmitted() && $commentForm->isValid())
@@ -188,7 +221,9 @@ class NewsController extends AbstractController
             'newData' => $newData,
             'commentForm' => $commentForm,
             'comments' => $comments,
-            'isAuthored' => $this->isAuthored
+            'isAuthored' => $this->isAuthored,
+            'userRole' => $userRole,
+            'ACCESS_TYPES' => self::ACCESS_TYPES,
         ]);
     }
 

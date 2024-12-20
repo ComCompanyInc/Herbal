@@ -130,14 +130,16 @@
         {{ form_start(addNewsForm, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
         <div class="mb-3">
             {{ form_label(addNewsForm.title, 'Заголовок', {'label_attr': {'class': 'form-label text-shadow'}}) }}
-            {{ form_widget(addNewsForm.title, {'attr': {'class': 'form-control'}}) }}
+            {{ form_widget(addNewsForm.title, {'attr': {'class': 'form-control', value: titleForEdit }}) }}
         </div>
         <div class="mb-3">
             {{ form_label(addNewsForm.text, 'Описание новости', {'label_attr': {'class': 'form-label text-shadow'}}) }}
-            {{ form_widget(addNewsForm.text, {'attr': {'class': 'form-control', 'rows': '5'}}) }}
+            {{ form_widget(addNewsForm.text, {'attr': {'class': 'form-control', 'rows': '5'}, value: textForEdit}) }}
         </div>
-        {% if isAuthored == true %}
+        {% if (isAuthored == true) and (idNews == null) %}
             <button type="submit" class="btn btn-primary">Добавить новость</button>
+        {% elseif (isAuthored == true) and (idNews != null) %}
+            <button type="submit" class="btn btn-redact">Изменить новость</button>
         {% else %}
             <h3> <i>Для добавления новости необходимо авторизоваться</i> </h3>
         {% endif %}

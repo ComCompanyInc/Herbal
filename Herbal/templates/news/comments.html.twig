@@ -171,8 +171,13 @@
             <th>{{ newData.content.author.access.email }}</th>
         </tr>
         <tr>
-            {% if (not(user is empty)) and (user.email == newData.content.author.access.email) %}
+            {% if (not(user is empty)) and (user.email == newData.content.author.access.email) and (userRole == ACCESS_TYPES.0) %}
                 <th><button data-text="news" class="btn-remove remove" id="{{ newData.content.id }}">Удалить новость</button></th>
+            {% elseif (not(user is empty)) and (userRole == ACCESS_TYPES.1) %}
+                <th>
+                    <button data-text="news" class="btn-remove remove" id="{{ newData.content.id }}">Удалить новость</button>
+                    <button data-text="news" class="btn-redact redact" id="{{ newData.content.id }}">Редактировать новость</button>
+                </th>
             {% endif %}
         </tr>
         </tbody>
@@ -213,7 +218,9 @@
                     <th>{{ comment.content.mainText }}</th>
                     <th>{{ comment.content.author.access.email }}</th>
                     <th>{{ comment.content.dateSending | date }}</th>
-                    {% if (not(user is empty)) and (user.email == comment.content.author.access.email) %}
+                    {% if (not(user is empty)) and (user.email == comment.content.author.access.email) and (userRole == ACCESS_TYPES.0) %}
+                        <th><button class="btn-remove remove" id="{{ comment.content.id }}">Удалить</button></th>
+                    {% elseif (not(user is empty)) and (userRole == ACCESS_TYPES.1) %}
                         <th><button class="btn-remove remove" id="{{ comment.content.id }}">Удалить</button></th>
                     {% endif %}
                 </tr>
@@ -232,6 +239,15 @@
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const buttons = document.querySelectorAll(".remove");
+                const buttonsRedact = document.querySelectorAll(".redact");
+
+                for (let i = 0; i < buttonsRedact.length; i++) {
+                    const button = buttonsRedact[i];
+
+                    button.addEventListener("click", function() {
+                        window.location.href = '/addNews/' + button.id;
+                    });
+                }
 
                 for (let i = 0; i < buttons.length; i++) {
                     const button = buttons[i];
