@@ -88,7 +88,7 @@ class NewsController extends AbstractController
             'news' => $result['news'],//$news
             'userRole' => $currentUserRole,
             'ACCESS_TYPES' => self::ACCESS_TYPES,
-            'user' => $this->idUser
+            'curUser' => $this->idUser
             ]);
     }
 
@@ -244,6 +244,7 @@ class NewsController extends AbstractController
             'isAuthored' => $this->isAuthored,
             'userRole' => $this->userRole,
             'ACCESS_TYPES' => self::ACCESS_TYPES,
+            'curUser' => $this->entityManager->getRepository(News::class)->findOneBy(['id' => $newData])->getContent()->getAuthor()//$this->idUser,
         ]);
     }
 
@@ -254,6 +255,15 @@ class NewsController extends AbstractController
         $this->entityManager->flush();
 
         return new JsonResponse(['success' => true]);
+    }
+
+    #[Route('/publishing/{id}', name: 'publishing')]
+    public function publishingNewsAction(string $id): Response
+    {
+        $this->entityManager->persist($this->entityManager->getRepository(Content::class)->findOneBy(['id' => $id])->setIsDelete(false));
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('news');
     }
 
     //функция с проверкой на аутентификацию пользователя
