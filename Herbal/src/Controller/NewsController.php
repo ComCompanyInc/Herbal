@@ -24,6 +24,10 @@ use Throwable;
 
 class NewsController extends AbstractController
 {
+    public $userRole = null; // переменная, хранящая роль пользователя
+    private $idAccess = null; // id доступа пользователя
+    private $idUser = null; // id пользователя
+
     const ACCESS_TYPES = [
       'Пользователь',
       'Администратор'
@@ -46,6 +50,8 @@ class NewsController extends AbstractController
     #[Route('/news', name: 'news')]
     public function newsAction(Request $request) :Response
     {
+        $currentUserRole = null; // текущая роль пользователя
+
         $user = $this->getUser();
         $currentVerifyUser = null;
 
@@ -62,6 +68,16 @@ class NewsController extends AbstractController
                 return $this->redirectToRoute('app_logout');
             } else {
                 $result = $newsService->getNews($this->entityManager, $request, $registrationForm);
+
+                // если пользователь атентифицирован
+                if($this->verifiedUser()) {
+                    //TODO: Сделать логику для вывода информации о пользователе
+
+//                    if($userRole = self::ACCESS_TYPES[1]) { // если пользователь является адмимнистратором
+//
+//                    }
+                    $currentUserRole = $this->userRole;
+                }
             }
         } else {
             $result = $newsService->getNews($this->entityManager, $request, $registrationForm);
@@ -69,7 +85,10 @@ class NewsController extends AbstractController
 
         return $this->render('news/news.html.twig', [
             'sortForm' => $result['registrationForm'],//$registrationForm,
-                'news' => $result['news']//$news
+            'news' => $result['news'],//$news
+            'userRole' => $currentUserRole,
+            'ACCESS_TYPES' => self::ACCESS_TYPES,
+            'user' => $this->idUser
             ]);
     }
 
@@ -82,21 +101,22 @@ class NewsController extends AbstractController
         $addNewsForm = $this->createForm(addNewsForm::class);
         $addNewsForm->handleRequest($request);
 
-        $idAccess = null;
+        //$idAccess = null;
 
         // Проверяем, что пользователь аутентифицирован
-        if ($this->getUser() !== null) {
-            try {
-                $idAccess = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
-                $idUser = $this->entityManager->getRepository(User::class)->findOneBy(['access' => $idAccess]);
-
-                $this->isAuthored = true;
-            } catch (\Exception $e) {
-                $idAccess = null;
-
-                $this->isAuthored = false;
-            }
-        }
+        $this->verifiedUser();
+//        if ($this->getUser() !== null) {
+//            try {
+//                $idAccess = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+//                $idUser = $this->entityManager->getRepository(User::class)->findOneBy(['access' => $idAccess]);
+//
+//                $this->isAuthored = true;
+//            } catch (\Exception $e) {
+//                $idAccess = null;
+//
+//                $this->isAuthored = false;
+//            }
+//        }
 
         //заголовок и текст для редактирования новости
         $titleForEdit = "";
@@ -116,7 +136,7 @@ class NewsController extends AbstractController
 
             $content->setAuthor($idUser);
             $content->setMainText($addNewsFormData['text']);
-            $content->setIsDelete(false);
+            $content->setIsDelete(true);
             $content->setDateSending(DateTime::createFromFormat('dd-mm-YY H:i:s', date('dd-mm-YY H:i:s')));
             $this->entityManager->persist($content);
             $this->entityManager->flush();
@@ -173,30 +193,28 @@ class NewsController extends AbstractController
 
         $idAccess = null;
 
-        $userRole = null; // переменная, хранящая роль пользователя
-// Проверяем, что пользователь аутентифицирован
-        if ($this->getUser() !== null) {
-            try {
-                $idAccess = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
-                $idUser = $this->entityManager->getRepository(User::class)->findOneBy(['access' => $idAccess]);
-
-                $userRole = $idUser->getAccess()->getRole()->getType();
-
-                $this->isAuthored = true;
-            } catch (\Exception $e) {
-                $idAccess = null;
-
-                $this->isAuthored = false;
-            }
-
-
-        }
+//// Проверяем, что пользователь аутентифицирован
+        $this->verifiedUser();
+//        if ($this->getUser() !== null) {
+//            try {
+//                $idAccess = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+//                $idUser = $this->entityManager->getRepository(User::class)->findOneBy(['access' => $idAccess]);
+//
+//                $this->userRole = $idUser->getAccess()->getRole()->getType(); //берем тип роли пользователя
+//
+//                $this->isAuthored = true;
+//            } catch (\Exception $e) {
+//                $idAccess = null;
+//
+//                $this->isAuthored = false;
+//            }
+//        }
 
         if($commentForm->isSubmitted() && $commentForm->isValid())
         {
             $addCommentsFormData = $commentForm->getData();
 
-            $content->setAuthor($idUser);
+            $content->setAuthor($this->idUser);
             $content->setMainText($addCommentsFormData['text']);
             $content->setIsDelete(false);
             $content->setDateSending(DateTime::createFromFormat('dd-mm-YY H:i:s', date('dd-mm-YY H:i:s')));
@@ -216,13 +234,15 @@ class NewsController extends AbstractController
 
         $newData = $this->entityManager->getRepository(News::class)->find($id);
 
+        //dd($this->userRole);
+
         return $this->render('news/comments.html.twig', [
-            'user' => $idAccess,
+            'user' => $this->idAccess,
             'newData' => $newData,
             'commentForm' => $commentForm,
             'comments' => $comments,
             'isAuthored' => $this->isAuthored,
-            'userRole' => $userRole,
+            'userRole' => $this->userRole,
             'ACCESS_TYPES' => self::ACCESS_TYPES,
         ]);
     }
@@ -234,5 +254,27 @@ class NewsController extends AbstractController
         $this->entityManager->flush();
 
         return new JsonResponse(['success' => true]);
+    }
+
+    //функция с проверкой на аутентификацию пользователя
+    public function verifiedUser(): bool
+    {
+        // Проверяем, что пользователь аутентифицирован
+        if ($this->getUser() !== null) {
+            try {
+                $this->idAccess = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+                $this->idUser = $this->entityManager->getRepository(User::class)->findOneBy(['access' => $this->idAccess]);
+
+                $this->userRole = $this->idUser->getAccess()->getRole()->getType(); //берем тип роли пользователя
+
+                $this->isAuthored = true;
+            } catch (\Exception $e) {
+                $idAccess = null;
+
+                $this->isAuthored = false;
+            }
+        }
+
+        return $this->isAuthored;
     }
 }

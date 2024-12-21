@@ -168,15 +168,25 @@
             <th>{{ newData.content.dateSending | date }}</th>
         </tr>
         <tr>
-            <th>{{ newData.content.author.access.email }}</th>
+             <th>{{ newData.content.author.access.email }}</th>
         </tr>
         <tr>
             {% if (not(user is empty)) and (user.email == newData.content.author.access.email) and (userRole == ACCESS_TYPES.0) %}
-                <th><button data-text="news" class="btn-remove remove" id="{{ newData.content.id }}">Удалить новость</button></th>
+                <th>
+                    <button data-text="news" class="btn-remove remove" id="{{ newData.content.id }}">Удалить новость</button>
+                    <button data-text="news" class="btn-redact redact" id="{{ newData.content.id }}">Редактировать новость</button>
+                </th>
             {% elseif (not(user is empty)) and (userRole == ACCESS_TYPES.1) %}
                 <th>
                     <button data-text="news" class="btn-remove remove" id="{{ newData.content.id }}">Удалить новость</button>
                     <button data-text="news" class="btn-redact redact" id="{{ newData.content.id }}">Редактировать новость</button>
+
+
+                    {% if newData.content.isDelete == true %}
+                        Статус: НЕ ОПУБЛИКОВАННО
+                    {% else %}
+                        Статус: ОПУБЛИКОВАННО
+                    {% endif %}
                 </th>
             {% endif %}
         </tr>

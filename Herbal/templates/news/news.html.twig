@@ -1,10 +1,12 @@
+{# templates/main.html.twig #}
+
 {% extends 'base.html.twig' %}
 
 {% block body %}
     <head>
         <meta charset="UTF-8">
         <title>Welcome!</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     </head>
 
@@ -170,46 +172,57 @@
     <h1>Главное сегодня:</h1>
 
     {{ form(sortForm) }}
-    {# <div class="d-flex justify-content-center mb-4">
-        <form name="news_form" method="post" class="d-flex align-items-center">
-            <div class="form-group">
-                <label for="news_form_name" class="required">По городу: </label>
-                <select id="news_form_name" name="news_form[name]" class="form-select">
-                    <option value="01925d9a-9def-79c9-b26e-8f71104e079a">Тверь</option>
-                    <option value="01925d9a-9def-79c9-b26e-8f71104e079b">Ржев</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <button type="submit" id="news_form_submit" name="news_form[submit]" class="btn btn-primary">Поиск новостей</button>
-            </div>
-            <input type="hidden" id="news_form__token" name="news_form[_token]" value="5ea4ed98a743441da58fce839e.-X3x3uuo_HFNahQWLlbnUp0Xy_xlpYkvtdNQdX929o0.mD-hkIjrjiB9XixzTwGJKtw6k5EG1L9ezJUeIEc3wNydT7K8hJiQNSwPVQ" />
-        </form>
-    </div>  #}
 
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Заголовок</th>
-            <th>Новость</th>
-            <th>Дата публикации</th>
-            <th>Город издателя</th>
-            <th>Действия</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for new in news %}
-            <tr>
-                {% if new.content.isDelete == false %}
-                    <th>{{ new.title }}</th>
-                    <th>{{ new.content.mainText | slice(0, 150)}} ...</th>
-                    <th>{{ new.content.dateSending | date }}</th>
-                    <th>{{ new.content.author.country.name }}</th>
-                    <th><button class="btn-read-more open-new" id="{{ new.id }}">Читать далее</button></th>
-                {% endif %}
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div style="display: flex; justify-content: space-between; width: 100%;">
+        <div style="flex: 1; margin-right: 20px;">
+            <table class="table">
+                <thead>
+                <tr>
+                    {% if (userRole == ACCESS_TYPES.1) %}
+                        <th>Статус</th>
+                    {% endif %}
+
+                    <th>Заголовок</th>
+                    <th>Новость</th>
+                    <th>Дата публикации</th>
+                    <th>Город издателя</th>
+                    <th>Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for new in news %}
+                    <tr>
+                        {% if (new.content.isDelete == false) and (userRole != ACCESS_TYPES.1) %}
+                            <th>{{ new.title }}</th>
+                            <th>{{ new.content.mainText | slice(0, 150)}} ...</th>
+                            <th>{{ new.content.dateSending | date }}</th>
+                            <th>{{ new.content.author.country.name }}</th>
+                            <th><button class="btn-read-more open-new" id="{{ new.id }}">Читать далее</button></th>
+                        {% elseif (userRole == ACCESS_TYPES.1) %}
+                            {% if (new.content.isDelete == false) %}
+                                <th>ОПУБЛИКОВАННО</th>
+                                <th>{{ new.title }} </th>
+                            {% elseif (new.content.isDelete == true) %}
+                                <th>НЕ ОПУБЛИКОВАННО</th>
+                                <th>{{ new.title }}</th>
+                            {% endif %}
+                            <th>{{ new.content.mainText | slice(0, 150)}} ...</th>
+                            <th>{{ new.content.dateSending | date }}</th>
+                            <th>{{ new.content.author.country.name }}</th>
+                            <th><button class="btn-read-more open-new" id="{{ new.id }}">Читать далее</button></th>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if (not(userRole is empty)) %}
+        <div style="flex: 0 0 auto; max-width: 300px; width: 100%;">
+            {% include 'header/contacts.html.twig' %}
+        </div>
+        {% endif %}
+    </div>
 
     {% block javascripts %}
         <script>

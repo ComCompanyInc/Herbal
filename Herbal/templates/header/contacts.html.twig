@@ -1,0 +1,37 @@
+{# templates/user_info.html.twig #}
+
+<div class="user-info">
+    <h3>Контактная информация</h3>
+    <p><strong>Фамилия:</strong> {{ user.surname }}</p>
+    <p><strong>Имя:</strong> {{ user.name }}</p>
+    <p><strong>Отчество:</strong> {{ user.patronumic }}</p>
+    <p><strong>Email:</strong> {{ user.access.email }}</p>
+    <p><strong>Дата рождения:</strong> {{ user.dateOfBirth | date('d.m.Y') }}</p>
+    <p><strong>Дата регистрации:</strong> {{ user.dateOfRegistration | date('d.m.Y') }}</p>
+    <p><strong>Город:</strong> {{ user.country.name }}</p>
+    <p><strong>Роль:</strong> {{ userRole }}</p>
+</div>
+
+<style>
+    .user-info {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+        width: 300px;
+    }
+
+    .user-info h3 {
+        color: #28a745;
+        margin-bottom: 15px;
+    }
+
+    .user-info p {
+        margin: 5px 0;
+    }
+
+    .user-info strong {
+        color: #333;
+    }
+</style>
