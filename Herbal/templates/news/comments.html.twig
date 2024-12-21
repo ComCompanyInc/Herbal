@@ -38,16 +38,6 @@
             z-index: -1;
         }
 
-        /*.logo {*/
-        /*    position: absolute;*/
-        /*    top: 20px;*/
-        /*    left: 20px;*/
-        /*    width: 150px;*/
-        /*    height: auto;*/
-        /*    opacity: 0;*/
-        /*    animation: fadeIn 2s ease-in-out forwards;*/
-        /*}*/
-
         @keyframes fadeIn {
             0% {
                 opacity: 0;
@@ -143,7 +133,6 @@
             background: #218838;
         }
 
-        /* Добавлено для позиционирования контактной информации */
         .content-wrapper {
             display: flex;
             width: 100%;
@@ -159,18 +148,52 @@
         .main-content {
             flex-grow: 1;
         }
+
+        /* Новые стили для кнопок */
+        .btn-redact {
+            background-color: #28a745; /* Зеленый цвет */
+            border: none;
+            color: white;
+            padding: 5px 10px; /* Уменьшено до размера кнопки "Снять с публикации" */
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px; /* Уменьшено до размера кнопки "Снять с публикации" */
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .btn-redact:hover {
+            background-color: #218838; /* Темно-зеленый цвет при наведении */
+        }
+
+        .btn-publishing {
+            background-color: #007bff; /* Синий цвет */
+            border: none;
+            color: white;
+            padding: 5px 10px; /* Уменьшено до размера кнопки "Снять с публикации" */
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px; /* Уменьшено до размера кнопки "Снять с публикации" */
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn-publishing:hover {
+            background-color: #0056b3; /* Темно-синий цвет при наведении */
+        }
     </style>
 
     <div class="background"></div>
 
-{#    <img src="/gear-chart-logo/O3IICD1.png" alt="Logo" class="logo">#}
-
     <div class="content-wrapper">
         <!-- Контактная информация слева -->
         {% if (not(userRole is empty)) %}
-        <div class="sidebar">
-            {% include 'header/contacts.html.twig' %}
-        </div>
+            <div class="sidebar">
+                {% include 'header/contacts.html.twig' %}
+            </div>
         {% endif %}
 
         <!-- Основной контент -->
@@ -209,7 +232,6 @@
                             <button data-text="news" class="btn-redact redact" id="{{ newData.content.id }}">Редактировать новость</button>
                             <button data-text="news" class="btn-publishing publishing" id="{{ newData.content.id }}">Опубликовать новость</button>
 
-
                             {% if newData.content.isDelete == true %}
                                 Статус: НЕ ОПУБЛИКОВАННО
                             {% else %}
@@ -229,16 +251,6 @@
             {% else %}
                 <h3> <i>чтобы добавить комментарий необходимо авторизоваться</i> </h3>
             {% endif %}
-            {# <form name="comment_form" method="post" class="mb-4">
-                <div class="form-group">
-                    <label for="comment_form_text" class="required">Описание:</label>
-                    <textarea id="comment_form_text" name="comment_form[text]" required="required" class="form-control"></textarea>
-                </div>
-                <div class="form-group">
-                    <button type="submit" id="comment_form_submit" name="comment_form[submit]" class="btn btn-primary">Отправить</button>
-                </div>
-                <input type="hidden" id="comment_form__token" name="comment_form[_token]" value="e5db2253d.SBOAqg9VIuscJXyfj_fG534HyivsudLEjdzrHwRiAIg.PnnJznoGU7loXx_99aingEdxs37Y3JCi3runcXwVVN0sKtOSW2RR3EprDw" />
-            </form> #}
 
             {% if not(comments is empty) %}
                 <table class="table">
