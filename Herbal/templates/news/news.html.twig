@@ -161,6 +161,7 @@
         .btn-primary:hover {
             background: #218838;
         }
+
     </style>
 
     <div class="background"></div>
@@ -224,6 +225,8 @@
         {% endif %}
     </div>
 
+    {% include 'header/paginationFooter.html.twig' %}
+
     {% block javascripts %}
         <script>
             document.addEventListener('DOMContentLoaded', () => {
@@ -236,7 +239,7 @@
 
                 for (let i = 0; i < buttons.length; i++) {
                     buttons[i].addEventListener('click', () => {
-                        window.location.href = "/comments/" + buttons[i].id;
+                        window.location.href = "/comments/" + buttons[i].id + "/1";
                     });
                 }
             });

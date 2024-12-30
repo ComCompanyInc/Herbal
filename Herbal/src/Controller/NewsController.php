@@ -28,6 +28,9 @@ class NewsController extends AbstractController
     private $idAccess = null; // id доступа пользователя
     private $idUser = null; // id пользователя
 
+    private const AMOUNT_OF_COMMENTS  = 30;
+    public $routeFragment = '';
+
     const ACCESS_TYPES = [
       'Пользователь',
       'Администратор'
@@ -47,9 +50,11 @@ class NewsController extends AbstractController
         return $this->render('main/main.html.twig');
     }
 
-    #[Route('/news', name: 'news')]
-    public function newsAction(Request $request) :Response
+    #[Route('/news/{page}', name: 'news')]
+    public function newsAction(Request $request, int $page) :Response
     {
+        $this->routeFragment = 'news';
+
         $currentUserRole = null; // текущая роль пользователя
 
         $user = $this->getUser();
@@ -67,7 +72,7 @@ class NewsController extends AbstractController
             if ($currentVerifyUser == false) {
                 return $this->redirectToRoute('app_logout');
             } else {
-                $result = $newsService->getNews($this->entityManager, $request, $registrationForm);
+                $result = $newsService->getNews($this->entityManager, $request, $registrationForm, $page);
 
                 // если пользователь атентифицирован
                 if($this->verifiedUser()) {
@@ -88,7 +93,8 @@ class NewsController extends AbstractController
             'news' => $result['news'],//$news
             'userRole' => $currentUserRole,
             'ACCESS_TYPES' => self::ACCESS_TYPES,
-            'curUser' => $this->idUser
+            'curUser' => $this->idUser,
+            'routeFragment' => $this->routeFragment,
             ]);
     }
 
@@ -168,9 +174,10 @@ class NewsController extends AbstractController
         ]);
     }
 
-    #[Route('/comments/{id}', name: 'comments')]
-    public function commentsAction(string $id, Request $request): Response
+    #[Route('/comments/{id}/{page}', name: 'comments')]
+    public function commentsAction(string $id, int $page, Request $request): Response
     {
+        $this->routeFragment = 'comments';
 
         $content = new Content();
         $contentNews = new ContentNews();
@@ -179,7 +186,7 @@ class NewsController extends AbstractController
         $commentForm->handleRequest($request);
 
         $comments = $this->entityManager->getRepository(ContentNews::class)->findCommentsByNews(
-            $this->entityManager->getRepository(News::class)->findOneBy(['id' => $id])
+            $this->entityManager->getRepository(News::class)->findOneBy(['id' => $id]), self::AMOUNT_OF_COMMENTS, $page
         );
 
         /*$idAccess = null;
@@ -228,7 +235,7 @@ class NewsController extends AbstractController
             $this->entityManager->flush();
 
             $comments = $this->entityManager->getRepository(ContentNews::class)->findCommentsByNews(
-                $this->entityManager->getRepository(News::class)->findOneBy(['id' => $id])
+                $this->entityManager->getRepository(News::class)->findOneBy(['id' => $id]), self::AMOUNT_OF_COMMENTS, $page
             );
         }
 
@@ -244,11 +251,12 @@ class NewsController extends AbstractController
             'isAuthored' => $this->isAuthored,
             'userRole' => $this->userRole,
             'ACCESS_TYPES' => self::ACCESS_TYPES,
-            'curUser' => $this->entityManager->getRepository(News::class)->findOneBy(['id' => $newData])->getContent()->getAuthor()//$this->idUser,
+            'curUser' => $this->entityManager->getRepository(News::class)->findOneBy(['id' => $newData])->getContent()->getAuthor(),//$this->idUser,
+            'routeFragment' => $this->routeFragment,
         ]);
     }
 
-    #[Route('/comments/remove/{id}', name: 'removeComment')]
+    #[Route('/remove_comments/{id}', name: 'removeComment')]
     public function deleteCommentsAction(string $id): JsonResponse
     {
         $this->entityManager->persist($this->entityManager->getRepository(Content::class)->findOneBy(['id' => $id])->setIsDelete(true));
@@ -263,7 +271,7 @@ class NewsController extends AbstractController
         $this->entityManager->persist($this->entityManager->getRepository(Content::class)->findOneBy(['id' => $id])->setIsDelete(false));
         $this->entityManager->flush();
 
-        return $this->redirectToRoute('news');
+        return $this->redirectToRoute('news/1');
     }
 
     //функция с проверкой на аутентификацию пользователя

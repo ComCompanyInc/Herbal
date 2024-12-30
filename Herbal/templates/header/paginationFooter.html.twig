@@ -1,0 +1,41 @@
+<div class="pagination">
+    {% set current_page = app.request.attributes.get('page', 1) %} {# Взять текущую страницу из роута #}
+
+    {% if routeFragment == 'comments' %}
+        {% set current_news_id = app.request.attributes.get('id') %} {# Взять текущую страницу из роута #}
+
+        <a href="{{ path( routeFragment , {'id' : current_news_id, 'page': current_page - 1}) }}" class="pagination-link {% if current_page <= 1 %}disabled{% endif %}">Предыдущая страница</a>
+        <a href="{{ path( routeFragment , {'id' : current_news_id, 'page': current_page + 1}) }}" class="pagination-link">Следующая страница</a>
+    {% elseif routeFragment == 'news' %}
+        <a href="{{ path( routeFragment , {'page': current_page - 1}) }}" class="pagination-link {% if current_page <= 1 %}disabled{% endif %}">Предыдущая страница</a>
+        <a href="{{ path( routeFragment , {'page': current_page + 1}) }}" class="pagination-link">Следующая страница</a>
+    {% endif %}
+</div>
+
+<style>
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .pagination-link {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    .pagination-link:hover {
+        background-color: #0056b3;
+    }
+
+    .pagination-link.disabled {
+        background-color: #cccccc;
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+</style>

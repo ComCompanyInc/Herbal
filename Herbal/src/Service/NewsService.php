@@ -11,9 +11,13 @@ use Symfony\Component\HttpFoundation\Request;
 
 class NewsService
 {
-    public function getNews(EntityManager $entityManager, Request $request, FormInterface $registrationForm): array
+    const AMOUNT_OF_NEWS = 20;
+
+    public function getNews(EntityManager $entityManager, Request $request, FormInterface $registrationForm, int $page = 1): array
     {
-        $news = $entityManager->getRepository(News::class)->findAllWithOrderBy();
+        $offset = ($page - 1) * self::AMOUNT_OF_NEWS;
+
+        $news = $entityManager->getRepository(News::class)->findAllWithOrderBy($offset, self::AMOUNT_OF_NEWS);
 
         $registrationForm->handleRequest($request);
 

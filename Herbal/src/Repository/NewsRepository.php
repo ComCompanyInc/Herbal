@@ -56,13 +56,27 @@ class NewsRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findAllWithOrderBy()
+    public function findAllWithOrderBy(int $offset, int $limit)
     {
+        if($offset > $this->getAmountOfPages($limit))
+        {
+            $offset = $this->getAmountOfPages($limit);
+        }
+
         return $this->createQueryBuilder('n')
             ->select('n')
             ->join('n.content', 'c')
             ->orderBy('c.dateSending', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+    }
+
+    public function getAmountOfPages(int $limit): int {
+        return ceil(($this->createQueryBuilder('n')
+            ->select('COUNT(n)')
+            ->getQuery()
+            ->getSingleScalarResult()) / ($limit));
     }
 }

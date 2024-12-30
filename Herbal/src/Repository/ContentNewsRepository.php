@@ -41,8 +41,15 @@ class ContentNewsRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    public function findCommentsByNews($idNews)
+    public function findCommentsByNews($idNews, int $limit, int $page = 1)
     {
+        $offset = ($page - 1) * $limit;
+
+        if($offset > $this->getAmountOfPages($limit))
+        {
+            $offset = $this->getAmountOfPages($limit);
+        }
+
         return $this->createQueryBuilder('c')
             ->select('c')
             ->join('c.content', 'cont')
@@ -52,7 +59,16 @@ class ContentNewsRepository extends ServiceEntityRepository
             ->where('(c.news = :idNews) AND (cont.isDelete = false)')
             ->setParameter('idNews', $idNews)
             ->orderBy('cont.dateSending', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+    }
+
+    public function getAmountOfPages(int $limit): int {
+        return ceil(($this->createQueryBuilder('c')
+                ->select('COUNT(c)')
+                ->getQuery()
+                ->getSingleScalarResult()) / ($limit));
     }
 }

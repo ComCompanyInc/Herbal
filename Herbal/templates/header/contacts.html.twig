@@ -18,8 +18,11 @@
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         padding: 20px;
-        margin-bottom: 20px;
         width: 300px;
+        position: sticky; /* Блок будет "прилипать" при прокрутке */
+        top: 20px; /* Отступ сверху, чтобы не прилипал вплотную к краю */
+        align-self: flex-start; /* Выравниваем по верхнему краю */
+        margin: 0 20px; /* Отступы слева и справа */
     }
 
     .user-info h3 {
