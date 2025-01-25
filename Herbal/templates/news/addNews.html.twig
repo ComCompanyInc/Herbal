@@ -127,14 +127,18 @@
     <h1>Добавить новость:</h1>
 
     <div class="form-container">
-        {{ form_start(addNewsForm, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+        {{ form_start(addNewsForm, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
         <div class="mb-3">
             {{ form_label(addNewsForm.title, 'Заголовок', {'label_attr': {'class': 'form-label text-shadow'}}) }}
-            {{ form_widget(addNewsForm.title, {'attr': {'class': 'form-control', value: titleForEdit }}) }}
+            {{ form_widget(addNewsForm.title, {'attr': {'class': 'form-control', 'value': titleForEdit }}) }}
         </div>
         <div class="mb-3">
             {{ form_label(addNewsForm.text, 'Описание новости', {'label_attr': {'class': 'form-label text-shadow'}}) }}
-            {{ form_widget(addNewsForm.text, {'attr': {'class': 'form-control', 'rows': '5'}, value: textForEdit}) }}
+            {{ form_widget(addNewsForm.text, {'attr': {'class': 'form-control', 'rows': '5'}, 'value': textForEdit}) }}
+        </div>
+        <div class="mb-3">
+            {{ form_label(addNewsForm.imageData, 'Фото к новости', {'label_attr': {'class': 'form-label text-shadow'}}) }}
+            {{ form_widget(addNewsForm.imageData, {'attr': {'class': 'form-control'}}) }}
         </div>
         {% if (isAuthored == true) and (idNews == null) %}
             <button type="submit" class="btn btn-primary">Добавить новость</button>
@@ -143,7 +147,6 @@
         {% else %}
             <h3> <i>Для добавления новости необходимо авторизоваться</i> </h3>
         {% endif %}
-
         {{ form_end(addNewsForm) }}
     </div>
 
