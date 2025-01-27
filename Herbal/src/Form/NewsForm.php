@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Country;
+use App\Entity\Subscribe;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -20,6 +21,11 @@ class NewsForm extends AbstractType
             ->add('name', EntityType::class, [
                 'label' => 'По городу: ',
                 'class' => Country::class,
+                'attr' => ['class' => 'form-control'],
+            ])
+            ->add('author', EntityType::class, [
+                'label' => 'По подписке: ',
+                'class' => Subscribe::class,
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('submit', SubmitType::class, [

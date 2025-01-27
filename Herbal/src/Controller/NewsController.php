@@ -127,6 +127,7 @@ class NewsController extends AbstractController
         //заголовок и текст для редактирования новости
         $titleForEdit = "";
         $textForEdit = "";
+        $ImageForEdit = "";
 
         if ($idNews != null) {
             $titleForEdit = $this->entityManager->getRepository(News::class)->findOneBy(['content' => $idNews])->getTitle();
