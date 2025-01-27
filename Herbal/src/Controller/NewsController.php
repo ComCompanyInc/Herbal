@@ -300,7 +300,7 @@ class NewsController extends AbstractController
         $this->entityManager->persist($this->entityManager->getRepository(Content::class)->findOneBy(['id' => $id])->setIsDelete(false));
         $this->entityManager->flush();
 
-        return $this->redirectToRoute('news/1');
+        return $this->redirectToRoute('news', ['page' => 1]);
     }
 
     //функция с проверкой на аутентификацию пользователя
