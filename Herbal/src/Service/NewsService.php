@@ -24,7 +24,7 @@ class NewsService
         if ($registrationForm->isSubmitted() && $registrationForm->isValid()) {
             $formData = $registrationForm->getData();
 
-            $news = $entityManager->getRepository(News::class)->findByCity($formData['name']);
+            $news = $entityManager->getRepository(News::class)->findByCity($formData['name'], $formData['author']);
         }
 
         return [

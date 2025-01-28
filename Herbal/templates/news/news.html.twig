@@ -174,6 +174,10 @@
 
     {{ form(sortForm) }}
 
+    {% if (not(userRole is empty)) %}
+        {% include 'header/subscribePanel.html.twig' %}
+    {% endif %}
+
     <div style="display: flex; justify-content: space-between; width: 100%;">
         <div style="flex: 1; margin-right: 20px;">
             <table class="table">
@@ -219,9 +223,9 @@
         </div>
 
         {% if (not(userRole is empty)) %}
-        <div style="flex: 0 0 auto; max-width: 300px; width: 100%;">
-            {% include 'header/contacts.html.twig' %}
-        </div>
+            <div style="flex: 0 0 auto; max-width: 300px; width: 100%;">
+                {% include 'header/contacts.html.twig' %}
+            </div>
         {% endif %}
     </div>
 

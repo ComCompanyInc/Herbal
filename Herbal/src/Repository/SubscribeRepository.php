@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Subscribe;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\User;
 
 /**
  * @extends ServiceEntityRepository<Subscribe>
@@ -40,4 +41,15 @@ class SubscribeRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findAuthorsBySubscriber(string $subscriber): array
+    {
+        return $this->createQueryBuilder('s')
+            //->select('a.access.email') // или другие поля, которые вам нужны
+            ->join('s.author', 'a')
+            ->andWhere('s.subscriber = :subscriber')
+            ->setParameter('subscriber', $subscriber)
+            ->getQuery()
+            ->getResult();
+    }
 }

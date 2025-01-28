@@ -23,11 +23,6 @@ class NewsForm extends AbstractType
                 'class' => Country::class,
                 'attr' => ['class' => 'form-control'],
             ])
-            ->add('author', EntityType::class, [
-                'label' => 'По подписке: ',
-                'class' => Subscribe::class,
-                'attr' => ['class' => 'form-control'],
-            ])
             ->add('submit', SubmitType::class, [
                 'label' => "поиск новостей",
                 'attr' => ['class' => 'btn btn-primary btn-lg mt-3'],

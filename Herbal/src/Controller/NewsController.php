@@ -6,6 +6,7 @@ use App\Entity\Access;
 use App\Entity\Content;
 use App\Entity\ContentNews;
 use App\Entity\News;
+use App\Entity\Subscribe;
 use App\Entity\User;
 use App\Form\AddNewsForm;
 use App\Form\CommentForm;
@@ -65,6 +66,8 @@ class NewsController extends AbstractController
 
         $registrationForm = $this->createForm(NewsForm::class);
 
+        $authors = [];
+
         //если у текущего пользователя в БД is_verified == false, то выходим из аккаунта
         if ($user) {
             $currentVerifyUser = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()])->getIsVerified();
@@ -82,6 +85,9 @@ class NewsController extends AbstractController
 //
 //                    }
                     $currentUserRole = $this->userRole;
+
+                    // Получаем список авторов, на которых подписан текущий пользователь
+                    $authors = $this->entityManager->getRepository(Subscribe::class)->findAuthorsBySubscriber((string)$this->idUser->getId());
                 }
             }
         } else {
@@ -95,6 +101,7 @@ class NewsController extends AbstractController
             'ACCESS_TYPES' => self::ACCESS_TYPES,
             'curUser' => $this->idUser,
             'routeFragment' => $this->routeFragment,
+            'authors' => $authors
             ]);
     }
 
