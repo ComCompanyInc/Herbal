@@ -101,7 +101,8 @@ class NewsController extends AbstractController
             'ACCESS_TYPES' => self::ACCESS_TYPES,
             'curUser' => $this->idUser,
             'routeFragment' => $this->routeFragment,
-            'authors' => $authors
+            'authors' => $authors,
+            'isSubscribed' => null,
             ]);
     }
 
@@ -276,6 +277,8 @@ class NewsController extends AbstractController
             $mimeType = $finfo->buffer($imageData);
         }
 
+        $isSubscribed = $this->entityManager->getRepository(Subscribe::class)->findBy(['subscriber' => $this->idUser]) ?? false;
+
         //dd($this->userRole);
 
         return $this->render('news/comments.html.twig', [
@@ -289,7 +292,8 @@ class NewsController extends AbstractController
             'curUser' => $this->entityManager->getRepository(News::class)->findOneBy(['id' => $newData])->getContent()->getAuthor(),//$this->idUser,
             'routeFragment' => $this->routeFragment,
             'imageData' => base64_encode($imageData),
-            'mimeType' => $mimeType
+            'mimeType' => $mimeType,
+            'isSubscribed' => $isSubscribed
         ]);
     }
 
@@ -331,5 +335,29 @@ class NewsController extends AbstractController
         }
 
         return $this->isAuthored;
+    }
+
+    #[Route('/write_subscribe/{id}')]
+    function writeSubscribe(string $id): JsonResponse {
+        $subscribe = new Subscribe();
+        $author = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $id]);
+
+        $subscribe->setAuthor($author/*$id*/);
+        $subscribe->setSubscriber($this->getUser()->getUsers()->first());
+        $this->entityManager->persist($subscribe);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['success']);
+    }
+
+    #[Route('/remove_subscribe/{id}')]
+    function removeSubscribe(string $id): JsonResponse {
+        $author = $this->entityManager->getRepository(Subscribe::class)->findOneBy(['author' => $id, 'subscriber' => $this->getUser()->getUsers()->first()]);
+
+        
+        $this->entityManager->remove($author);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['success']);
     }
 }
