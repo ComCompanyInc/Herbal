@@ -52,4 +52,13 @@ class Subscribe
 
         return $this;
     }
+
+        // Переопределяем метод __toString()
+        // public function __toString(): string
+        // {
+        //     // Возвращаем строковое представление объекта
+        
+        //     return 'Подписка: автор ' . 
+        //         $this->getAuthor()->getAccess()->getEmail(); // или другое свойство User
+        // }
 }

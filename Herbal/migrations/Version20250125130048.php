@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20241207150014 extends AbstractMigration
+final class Version20250125130048 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -37,10 +37,12 @@ final class Version20241207150014 extends AbstractMigration
         $this->addSql('CREATE TABLE country (id UUID NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_5373C9665E237E06 ON country (name)');
         $this->addSql('COMMENT ON COLUMN country.id IS \'(DC2Type:uuid)\'');
-        $this->addSql('CREATE TABLE news (id UUID NOT NULL, content_id UUID NOT NULL, title VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE news (id UUID NOT NULL, content_id UUID NOT NULL, title VARCHAR(255) NOT NULL, image_data BYTEA DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_1DD3995084A0A3ED ON news (content_id)');
         $this->addSql('COMMENT ON COLUMN news.id IS \'(DC2Type:uuid)\'');
         $this->addSql('COMMENT ON COLUMN news.content_id IS \'(DC2Type:uuid)\'');
+        $this->addSql('CREATE TABLE role (id UUID NOT NULL, type VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('COMMENT ON COLUMN role.id IS \'(DC2Type:uuid)\'');
         $this->addSql('CREATE TABLE subscribe (id UUID NOT NULL, author_id UUID NOT NULL, subscriber_id UUID NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_68B95F3EF675F31B ON subscribe (author_id)');
         $this->addSql('CREATE INDEX IDX_68B95F3E7808B1AD ON subscribe (subscriber_id)');
@@ -82,6 +84,7 @@ final class Version20241207150014 extends AbstractMigration
         $this->addSql('DROP TABLE content_news');
         $this->addSql('DROP TABLE country');
         $this->addSql('DROP TABLE news');
+        $this->addSql('DROP TABLE role');
         $this->addSql('DROP TABLE subscribe');
         $this->addSql('DROP TABLE "user"');
     }

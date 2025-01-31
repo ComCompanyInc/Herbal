@@ -6,6 +6,7 @@ use App\Entity\Access;
 use App\Entity\Content;
 use App\Entity\ContentNews;
 use App\Entity\News;
+use App\Entity\Subscribe;
 use App\Entity\User;
 use App\Form\AddNewsForm;
 use App\Form\CommentForm;
@@ -65,6 +66,8 @@ class NewsController extends AbstractController
 
         $registrationForm = $this->createForm(NewsForm::class);
 
+        $authors = [];
+
         //если у текущего пользователя в БД is_verified == false, то выходим из аккаунта
         if ($user) {
             $currentVerifyUser = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()])->getIsVerified();
@@ -82,6 +85,9 @@ class NewsController extends AbstractController
 //
 //                    }
                     $currentUserRole = $this->userRole;
+
+                    // Получаем список авторов, на которых подписан текущий пользователь
+                    $authors = $this->entityManager->getRepository(Subscribe::class)->findAuthorsBySubscriber((string)$this->idUser->getId());
                 }
             }
         } else {
@@ -95,6 +101,8 @@ class NewsController extends AbstractController
             'ACCESS_TYPES' => self::ACCESS_TYPES,
             'curUser' => $this->idUser,
             'routeFragment' => $this->routeFragment,
+            'authors' => $authors,
+            'isSubscribed' => null,
             ]);
     }
 
@@ -127,15 +135,18 @@ class NewsController extends AbstractController
         //заголовок и текст для редактирования новости
         $titleForEdit = "";
         $textForEdit = "";
+        $ImageForEdit = "";
 
         if ($idNews != null) {
             $titleForEdit = $this->entityManager->getRepository(News::class)->findOneBy(['content' => $idNews])->getTitle();
             $textForEdit = $this->entityManager->getRepository(News::class)->findOneBy(['content' => $idNews])->getContent()->getMainText();
+            $ImageForEdit = $this->entityManager->getRepository(News::class)->findOneBy(['content' => $idNews])->getImageData();
         }
 
         //если нажата кнопка "Сохранить новость" - сохраняем новость
         if (($addNewsForm->isSubmitted() && $addNewsForm->isValid()) && ($idNews == null || $idNews == "")) {
             $addNewsFormData = $addNewsForm->getData();
+            $imgData = $addNewsForm->get('imageData')->getData();
 
             $idAccess = $this->entityManager->getRepository(Access::class)->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
             $idUser = $this->entityManager->getRepository(User::class)->findOneBy(['access' => $idAccess]);
@@ -148,29 +159,42 @@ class NewsController extends AbstractController
             $this->entityManager->flush();
 
             $news->setTitle($addNewsFormData['title']);
+            if (isset($imgData)) {
+                $news->setImageData(file_get_contents($imgData->getPathname())); //!
+            }
+
             $news->setContent($content);
             $this->entityManager->persist($news);
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('news');
-        } else if(($addNewsForm->isSubmitted() && $addNewsForm->isValid()) && ($idNews != null || $idNews != "")) { // иначе если ключ от новости есть и нажата кнопка редактирования новости, редактируем новость
+            return $this->redirectToRoute('news', ['page' => 1]);
+        } else if (($addNewsForm->isSubmitted() && $addNewsForm->isValid()) && ($idNews != null || $idNews != "")) {
+            // Редактирование новости
             $addNewsFormData = $addNewsForm->getData();
-
+            $imgData = $addNewsForm->get('imageData')->getData(); // Получаем загруженный файл
+        
             $currentNews = $this->entityManager->getRepository(News::class)->findOneBy(['content' => $idNews]);
             $currentNews->setTitle($addNewsFormData['title'] . ' (ред.)');
             $currentNews->getContent()->setMainText($addNewsFormData['text']);
+        
+            // Если загружено новое фото, обновляем его
+            if ($imgData) {
+                $currentNews->setImageData(file_get_contents($imgData->getPathname()));
+            }
+        
             $this->entityManager->persist($currentNews);
             $this->entityManager->flush();
-
-            return $this->redirectToRoute('comments', ['id' => $this->entityManager->getRepository(News::class)->findOneBy(['content' => $idNews])->getId()]);
+        
+            return $this->redirectToRoute('comments', ['id' => $this->entityManager->getRepository(News::class)->findOneBy(['content' => $idNews])->getId(), 'page' => 1]);
         }
-
+        
         return $this->render('news/addNews.html.twig', [
             'addNewsForm' => $addNewsForm,
             'isAuthored' => $this->isAuthored,
             'idNews' => $idNews,
             'titleForEdit' => $titleForEdit,
             'textForEdit' => $textForEdit,
+            'imageForEdit' => $ImageForEdit,
         ]);
     }
 
@@ -241,6 +265,20 @@ class NewsController extends AbstractController
 
         $newData = $this->entityManager->getRepository(News::class)->find($id);
 
+        $imageData = null;
+        $finfo = null;
+        $mimeType = null;
+
+        if ($newData->getImageData() != null) {
+            $imageData = stream_get_contents($newData->getImageData());
+
+            // Определяем MIME-тип
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $mimeType = $finfo->buffer($imageData);
+        }
+
+        $isSubscribed = $this->entityManager->getRepository(Subscribe::class)->findBy(['subscriber' => $this->idUser]) ?? false;
+
         //dd($this->userRole);
 
         return $this->render('news/comments.html.twig', [
@@ -253,6 +291,9 @@ class NewsController extends AbstractController
             'ACCESS_TYPES' => self::ACCESS_TYPES,
             'curUser' => $this->entityManager->getRepository(News::class)->findOneBy(['id' => $newData])->getContent()->getAuthor(),//$this->idUser,
             'routeFragment' => $this->routeFragment,
+            'imageData' => base64_encode($imageData),
+            'mimeType' => $mimeType,
+            'isSubscribed' => $isSubscribed
         ]);
     }
 
@@ -271,7 +312,7 @@ class NewsController extends AbstractController
         $this->entityManager->persist($this->entityManager->getRepository(Content::class)->findOneBy(['id' => $id])->setIsDelete(false));
         $this->entityManager->flush();
 
-        return $this->redirectToRoute('news/1');
+        return $this->redirectToRoute('news', ['page' => 1]);
     }
 
     //функция с проверкой на аутентификацию пользователя
@@ -294,5 +335,29 @@ class NewsController extends AbstractController
         }
 
         return $this->isAuthored;
+    }
+
+    #[Route('/write_subscribe/{id}')]
+    function writeSubscribe(string $id): JsonResponse {
+        $subscribe = new Subscribe();
+        $author = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $id]);
+
+        $subscribe->setAuthor($author/*$id*/);
+        $subscribe->setSubscriber($this->getUser()->getUsers()->first());
+        $this->entityManager->persist($subscribe);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['success']);
+    }
+
+    #[Route('/remove_subscribe/{id}')]
+    function removeSubscribe(string $id): JsonResponse {
+        $author = $this->entityManager->getRepository(Subscribe::class)->findOneBy(['author' => $id, 'subscriber' => $this->getUser()->getUsers()->first()]);
+
+        
+        $this->entityManager->remove($author);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['success']);
     }
 }

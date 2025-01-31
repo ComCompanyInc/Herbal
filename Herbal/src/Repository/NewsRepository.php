@@ -42,15 +42,20 @@ class NewsRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    public function findByCity(string $cityName)
+    public function findByCity(string $cityName, string $authorEmail)
     {
         return $this->createQueryBuilder('n')
             ->select('n')
             ->join('n.content', 'c')
             ->join('c.author', 'a')
             ->join('a.country', 'country')
+            ->join('a.access', 'access')
+
             ->where('country.name = :cityName')
             ->setParameter('cityName', $cityName)
+            ->orWhere('access.email = :authorEmail')
+            ->setParameter('authorEmail', $authorEmail)
+
             ->orderBy('c.dateSending', 'DESC')
             ->getQuery()
             ->getResult();

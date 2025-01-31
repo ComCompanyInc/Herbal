@@ -1,0 +1,86 @@
+{# header/subscribePanel.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .subscribe-panel {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 20px 40px; /* Отступы по бокам */
+            width: calc(100% - 80px); /* Ширина с учетом отступов */
+        }
+
+        .subscribe-panel h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .subscribe-panel ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .subscribe-panel li {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .subscribe-panel li:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .subscribe-panel li .icon {
+            margin-right: 10px;
+            color: #007bff;
+        }
+
+        .subscribe-panel li .email {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .subscribe-panel li.no-subscriptions {
+            text-align: center;
+            color: #777;
+            font-style: italic;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="subscribe-panel">
+        <h1>Ваши подписки</h1>
+        <ul>
+            {% for author in authors %}
+                <li>
+                    <span class="icon">📧</span>
+                    <span class="email"><b> {{ author.author.access.email }}, 
+                    (
+                        
+                            {{ author.author.surname }},
+                            {{ author.author.name }},
+                            {{ author.author.patronumic }}
+                        
+                    )</b>
+                    </span>
+                </li>
+            {% else %}
+                <li class="no-subscriptions">Вы ни на кого не подписаны.</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

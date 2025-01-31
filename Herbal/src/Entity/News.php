@@ -24,6 +24,9 @@ class News
     #[Assert\NotNull]
     private ?string $title = null;
 
+    #[ORM\Column(type: 'blob', nullable: true)]
+    private $imageData;
+
     #[ORM\ManyToOne(inversedBy: 'news')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Content $content = null;
@@ -54,6 +57,16 @@ class News
         $this->title = $title;
 
         return $this;
+    }
+
+    public function getImageData()
+    {
+        return $this->imageData;
+    }
+
+    public function setImageData($imageData): void
+    {
+        $this->imageData = $imageData;
     }
 
     public function getContent(): ?Content

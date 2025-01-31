@@ -184,6 +184,21 @@
         .btn-publishing:hover {
             background-color: #0056b3; /* Темно-синий цвет при наведении */
         }
+
+        .news-image {
+            border-radius: 12px; /* Закругленные углы */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тень */
+            max-width: 100%; /* Адаптивность */
+            height: auto; /* Сохранение пропорций */
+            display: block; /* Центрирование */
+            margin: 0 auto; /* Центрирование */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Плавные анимации */
+        }
+
+        .news-image:hover {
+            transform: scale(1.05); /* Увеличение при наведении */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Увеличенная тень при наведении */
+        }
     </style>
 
     <div class="background"></div>
@@ -207,6 +222,11 @@
                 </tr>
                 </thead>
                 <tbody>
+                <tr>
+                    <th>
+                        <img class="news-image" src="data:{{ mimeType }};base64,{{ imageData }}" alt="News Image">
+                    </th>
+                </tr>
                 <tr>
                     <th>
                         <p>
@@ -326,7 +346,7 @@
                             // Проверяем, равно ли значение 'news'
                             if (dataText === 'news') {
                                 // Перебрасываем пользователя на другую страницу
-                                window.location.href = '/news';
+                                window.location.href = '/news/1';
                             }
                         }
                     });

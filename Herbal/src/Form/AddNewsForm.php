@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class AddNewsForm extends AbstractType
@@ -18,6 +19,11 @@ class AddNewsForm extends AbstractType
             ])
             ->add('text', TextareaType::class, [
                 'label' => 'Описание новости:'
+            ])
+            ->add('imageData', FileType::class, [
+                'label' => 'Изображение к новости:',
+                'mapped' => false,
+                'required' => true
             ]);
             //->add('submit', SubmitType::class, [
                 //'label' => 'Отправить'

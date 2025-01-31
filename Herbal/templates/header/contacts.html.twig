@@ -1,5 +1,4 @@
 {# header/contacts.html.twig #}
-
 <div class="user-info">
     <h3>Контактная информация</h3>
     <p><strong>Фамилия:</strong> {{ curUser.surname }}</p>
@@ -10,7 +9,52 @@
     <p><strong>Дата регистрации:</strong> {{ curUser.dateOfRegistration | date('d.m.Y') }}</p>
     <p><strong>Город:</strong> {{ curUser.country.name }}</p>
     <p><strong>Роль:</strong> {{ userRole }}</p>
+    
+    {% if (isSubscribed != false) and (isSubscribed != null) %}
+        <button type="submit" id="{{ curUser.id }}" class="btn-unsubscribe unsubscribe">Отписаться</button>
+    {% elseif (isSubscribed == false) %}
+        <button type="submit" id="{{ curUser.id }}" class="btn-subscribe subscribe">Подписаться</button>
+    {% endif %}
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const subscribeButton = document.querySelector(".subscribe"); // Первая кнопка "Подписаться"
+        const unsubscribeButton = document.querySelector(".unsubscribe"); // Первая кнопка "Отписаться"
+
+        // Обработка кнопки "Подписаться"
+        if (subscribeButton) {
+            subscribeButton.addEventListener("click", function(event) {
+                event.preventDefault(); // Отменяем стандартное поведение кнопки
+                const userId = this.id; // Получаем ID пользователя
+                startAjax(userId, '/write_subscribe/');
+            });
+        }
+
+        // Обработка кнопки "Отписаться"
+        if (unsubscribeButton) {
+            unsubscribeButton.addEventListener("click", function(event) {
+                event.preventDefault(); // Отменяем стандартное поведение кнопки
+                const userId = this.id; // Получаем ID пользователя
+                startAjax(userId, '/remove_subscribe/');
+            });
+        }
+
+        function startAjax(id, patch) {
+            $.ajax({
+                url: patch + id,
+                type: 'GET',
+                success: function(response) {
+                    console.log("Успешно:", response);
+                    location.reload(); // Перезагружаем страницу
+                },
+                error: function() {
+                    alert("Ошибка при выполнении запроса");
+                }
+            });
+        }
+    });
+</script>
 
 <style>
     .user-info {
